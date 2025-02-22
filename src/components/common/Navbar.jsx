@@ -35,7 +35,7 @@ export default function Navbar() {
                         onClick={() => mobile && setIsOpen(false)}
                         className={mobile ? "block w-full rounded-md" : undefined}
                     >
-                        <NavigationMenuLink className={mobile ? undefined : navigationMenuTriggerStyle()}>
+                        <NavigationMenuLink className={`${mobile ? undefined : navigationMenuTriggerStyle()} bg-transparent`}>
                             {item.name}
                         </NavigationMenuLink>
                     </Link>
