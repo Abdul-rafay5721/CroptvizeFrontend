@@ -46,7 +46,7 @@ export default function Navbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="max-w-7xl mx-auto flex h-16 items-center justify-between xl:px-0 md:px-5 px-4">
+            <div className="max-w-7xl mx-auto flex h-16 items-center justify-between xl:px-2 md:px-5 px-4">
                 <Link to="/" className="flex items-center space-x-2">
                     <Leaf className="h-6 w-6" />
                     <span className="font-bold">Croptivize</span>

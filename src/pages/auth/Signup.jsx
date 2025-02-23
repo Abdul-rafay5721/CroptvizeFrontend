@@ -24,7 +24,7 @@ export default function Signup() {
     }
 
     return (
-        <div className="bg-gray-50 flex min-h-screen flex-col items-center justify-center sm:px-0 px-4">
+        <div className="bg-gray-50 flex sm:min-h-screen min-h-[90vh] flex-col items-center justify-center sm:px-0 px-4">
             <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:max-w-md bg-card shadow-lg sm:p-6 p-4 rounded-lg">
                 <div className="flex flex-col space-y-2 text-center">
                     <Leaf className="mx-auto h-6 w-6" />
