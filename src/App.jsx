@@ -1,6 +1,9 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import UserLayout from './layout/UserLayout'
 import Home from './pages/sections/Home'
+import DetectPage from './pages/sections/DetectDisease'
+import Shop from './pages/sections/Shop'
+import ContactPage from './pages/sections/Contact'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import { Toaster } from './components/ui/sonner'
@@ -16,6 +19,18 @@ function App() {
         {
           path: "/",
           element: <Home />
+        },
+        {
+          path: "/detect",
+          element: <DetectPage />
+        },
+        {
+          path: "/shop",
+          element: <Shop />
+        },
+        {
+          path: "/contact",
+          element: <ContactPage />
         },
       ]
     },

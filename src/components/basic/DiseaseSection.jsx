@@ -70,7 +70,7 @@ export default function DiseasePreview() {
                             {disease.images?.[0] && (
                                 <div className="relative">
                                     <img
-                                        src={disease.images[0].regular_url || "/placeholder.svg"}
+                                        src={disease.images[0].regular_url || "/placeholder.jpg"}
                                         alt={disease.common_name}
                                         fill
                                         className="object-cover max-h-60 w-full"
