@@ -3,16 +3,25 @@ import { Camera, Upload, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
+import DiseaseResult from "../../components/basic/DiseaseResult"
 
 export default function DetectPage() {
     const [selectedImage, setSelectedImage] = useState(null)
     const [diseasePrediction, setDiseasePrediction] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const [isCameraActive, setIsCameraActive] = useState(false)
+    const [cameraStream, setCameraStream] = useState(null)
     const videoRef = useRef(null)
     const fileInputRef = useRef(null)
+    const containerRef = useRef(null)
 
-    // Handle file upload
+    const scrollIntoView = (id) => {
+        const element = document.getElementById(id)
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth" })
+        }
+    }
+
     const handleFileUpload = (event) => {
         event.preventDefault()
         const file = event.target.files?.[0]
@@ -23,15 +32,14 @@ export default function DetectPage() {
                     setSelectedImage(reader.result)
                 }
                 reader.readAsDataURL(file)
+                scrollIntoView("imgContainer")
             } else {
                 toast.error("Please upload an image file")
             }
         }
-        // Reset file input value to allow selecting the same file again
         event.target.value = ''
     }
 
-    // Handle drag and drop
     const handleDragOver = (event) => {
         event.preventDefault()
     }
@@ -45,7 +53,7 @@ export default function DetectPage() {
                 setSelectedImage(reader.result)
             }
             reader.readAsDataURL(file)
-            // Reset file input value
+            scrollIntoView("imgContainer")
             if (fileInputRef.current) {
                 fileInputRef.current.value = ''
             }
@@ -56,44 +64,87 @@ export default function DetectPage() {
 
     const startCamera = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            })
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream
-                setIsCameraActive(true)
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop())
             }
-        } catch (error) {
-            toast.error("Unable to access camera")
-            console.error(error)
-        }
-    }
 
-    const stopCamera = () => {
-        if (videoRef.current?.srcObject) {
-            const tracks = videoRef.current.srcObject.getTracks()
-            tracks.forEach((track) => track.stop())
-            videoRef.current.srcObject = null
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: true
+            })
+
+            setCameraStream(stream)
+            setIsCameraActive(true)
+
+        } catch (error) {
+            console.error("Camera access error:", error)
+            toast.error("Unable to access camera: " + error.message)
             setIsCameraActive(false)
         }
     }
 
+    useEffect(() => {
+        if (isCameraActive && cameraStream && videoRef.current) {
+            console.log("Attaching stream to video element")
+            videoRef.current.srcObject = cameraStream
+
+            videoRef.current.onloadedmetadata = () => {
+                console.log("Video metadata loaded")
+                videoRef.current.play().catch(e => {
+                    console.error("Error playing video:", e)
+                    toast.error("Error playing video: " + e.message)
+                })
+            }
+
+            videoRef.current.onerror = (e) => {
+                console.error("Video error:", e)
+                toast.error("Video error: " + e.target.error.message)
+            }
+        }
+    }, [isCameraActive, cameraStream])
+
+    const stopCamera = () => {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => {
+                track.stop()
+            })
+            setCameraStream(null)
+        }
+        if (videoRef.current) {
+            videoRef.current.srcObject = null
+        }
+        setIsCameraActive(false)
+    }
+
     const captureImage = () => {
         if (videoRef.current) {
-            const canvas = document.createElement("canvas")
-            const video = videoRef.current
-            canvas.width = video.videoWidth
-            canvas.height = video.videoHeight
-            const ctx = canvas.getContext("2d")
-            if (ctx) {
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-                const imageDataUrl = canvas.toDataURL("image/jpeg")
-                setSelectedImage(imageDataUrl)
-                stopCamera()
+            try {
+                const canvas = document.createElement("canvas")
+                const video = videoRef.current
+
+                if (video.videoWidth === 0 || video.videoHeight === 0) {
+                    toast.error("Cannot capture image - video stream not ready")
+                    return
+                }
+
+                canvas.width = video.videoWidth
+                canvas.height = video.videoHeight
+
+                const ctx = canvas.getContext("2d")
+                if (ctx) {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+                    const imageDataUrl = canvas.toDataURL("image/jpeg")
+                    setSelectedImage(imageDataUrl)
+                    scrollIntoView("imgContainer")
+                    stopCamera()
+                } else {
+                    toast.error("Could not get canvas context")
+                }
+            } catch (error) {
+                console.error("Error capturing image:", error)
+                toast.error("Error capturing image: " + error.message)
             }
+        } else {
+            toast.error("Video element not available")
         }
     }
 
@@ -102,9 +153,35 @@ export default function DetectPage() {
 
         setIsLoading(true)
         try {
-            // TODO: Implement actual disease detection API call
-            await new Promise((resolve) => setTimeout(resolve, 2000)) // Simulate API call
+            const apiKey = 'jlCCUReGnuhSYJeGy6dOPFtv35YxYfg4xev0XdpRRbF7Smeo7I'
+            const response = await fetch('https://plant.id/api/v3/health_assessment?details=description,treatment,cause', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Api-Key': apiKey
+                },
+                body: JSON.stringify({
+                    images: [selectedImage]
+                })
+            })
+
+            if (!response.ok) {
+                toast.error("Error detecting disease")
+                console.error("Error response:", response)
+                return
+            }
+
+            const data = await response.json()
+            console.log(data)
+
+            if (data.result.is_plant.binary === false) {
+                toast.error("No plant detected in the image")
+                return
+            }
+            setDiseasePrediction(data.result.disease.suggestions)
+
             toast.success("Disease detection completed!")
+            scrollIntoView("results")
         } catch (error) {
             toast.error("Error detecting disease")
             console.error(error)
@@ -113,14 +190,13 @@ export default function DetectPage() {
         }
     }
 
-    // Clean up camera stream when component unmounts
     useEffect(() => {
         return () => {
-            if (isCameraActive) {
-                stopCamera()
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop())
             }
         }
-    }, [isCameraActive])
+    }, [cameraStream])
 
     return (
         <div className="max-w-4xl mx-auto lg:px-0 px-4 py-8 md:py-12">
@@ -163,14 +239,16 @@ export default function DetectPage() {
                         <CardDescription>Take a photo using your device camera</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="relative min-h-[200px] rounded-lg border-2 border-dashed">
+                        <div className="relative min-h-[200px] rounded-lg border-2 border-dashed" ref={containerRef}>
                             {isCameraActive ? (
                                 <>
                                     <video
                                         ref={videoRef}
                                         autoPlay
                                         playsInline
+                                        muted
                                         className="h-[200px] w-full rounded-lg object-cover"
+                                        style={{ maxHeight: "200px" }}
                                     />
                                     <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
                                         <Button onClick={captureImage}>Capture</Button>
@@ -195,14 +273,14 @@ export default function DetectPage() {
 
             {/* Image Preview and Detection */}
             {selectedImage && (
-                <div className="mt-8 grid gap-6 md:grid-cols-2">
+                <div className="mt-8 grid gap-6 md:grid-cols-2" id="imgContainer">
                     <Card>
                         <CardHeader className="relative">
                             <CardTitle>Selected Image</CardTitle>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute right-3 -top-3"
+                                className="absolute right-3 sm:-top-3 -top-2"
                                 onClick={() => setSelectedImage(null)}
                             >
                                 <X className="h-4 w-4" />
@@ -231,20 +309,10 @@ export default function DetectPage() {
 
                     {/* Disease Prediction */}
                     {diseasePrediction && (
-                        <Card>
-                            <CardHeader className="relative">
-                                <CardTitle>Results</CardTitle>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="absolute right-3 -top-3"
-                                    onClick={() => setDiseasePrediction(null)}
-                                >
-                                    <X className="h-4 w-4" />
-                                </Button>
-                            </CardHeader>
-                            <CardContent></CardContent>
-                        </Card>
+                        <DiseaseResult
+                            diseases={diseasePrediction}
+                            onClose={() => setDiseasePrediction(null)}
+                        />
                     )}
                 </div>
             )}

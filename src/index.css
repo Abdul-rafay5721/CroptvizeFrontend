@@ -114,4 +114,28 @@
   body {
     @apply bg-background text-foreground
   }
+
+  .resultContScroll {
+    @apply overflow-y-auto pr-4;
+    scrollbar-width: thin;
+    /* For Firefox */
+    scrollbar-color: hsl(var(--muted-foreground)) transparent;
+    /* For Firefox */
+  }
+
+  .resultContScroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .resultContScroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .resultContScroll::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  .resultContScroll::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
 }
