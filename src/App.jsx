@@ -4,6 +4,7 @@ import Home from './pages/sections/Home'
 import DetectPage from './pages/sections/DetectDisease'
 import Shop from './pages/sections/Shop'
 import ContactPage from './pages/sections/Contact'
+import Guide from './pages/sections/Guide'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import { Toaster } from './components/ui/sonner'
@@ -31,6 +32,10 @@ function App() {
         {
           path: "/contact",
           element: <ContactPage />
+        },
+        {
+          path: "/guide",
+          element: <Guide />
         },
       ]
     },

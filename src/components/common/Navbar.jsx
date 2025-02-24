@@ -20,6 +20,7 @@ const NAVIGATION_ITEMS = [
     { name: "Home", path: "/" },
     { name: "Disease Detection", path: "/detect" },
     { name: "Shop", path: "/shop" },
+    { name: "Guide", path: "/guide" },
     { name: "Contact", path: "/contact" },
 ]
 
