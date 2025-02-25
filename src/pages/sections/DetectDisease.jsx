@@ -15,13 +15,6 @@ export default function DetectPage() {
     const fileInputRef = useRef(null)
     const containerRef = useRef(null)
 
-    const scrollIntoView = (id) => {
-        const element = document.getElementById(id)
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth" })
-        }
-    }
-
     const handleFileUpload = (event) => {
         event.preventDefault()
         const file = event.target.files?.[0]
@@ -32,7 +25,6 @@ export default function DetectPage() {
                     setSelectedImage(reader.result)
                 }
                 reader.readAsDataURL(file)
-                scrollIntoView("imgContainer")
             } else {
                 toast.error("Please upload an image file")
             }
@@ -53,7 +45,6 @@ export default function DetectPage() {
                 setSelectedImage(reader.result)
             }
             reader.readAsDataURL(file)
-            scrollIntoView("imgContainer")
             if (fileInputRef.current) {
                 fileInputRef.current.value = ''
             }
@@ -69,7 +60,9 @@ export default function DetectPage() {
             }
 
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: true
+                video: {
+                    facingMode: "environment"
+                }
             })
 
             setCameraStream(stream)
@@ -84,11 +77,9 @@ export default function DetectPage() {
 
     useEffect(() => {
         if (isCameraActive && cameraStream && videoRef.current) {
-            console.log("Attaching stream to video element")
             videoRef.current.srcObject = cameraStream
 
             videoRef.current.onloadedmetadata = () => {
-                console.log("Video metadata loaded")
                 videoRef.current.play().catch(e => {
                     console.error("Error playing video:", e)
                     toast.error("Error playing video: " + e.message)
@@ -134,8 +125,8 @@ export default function DetectPage() {
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
                     const imageDataUrl = canvas.toDataURL("image/jpeg")
                     setSelectedImage(imageDataUrl)
-                    scrollIntoView("imgContainer")
                     stopCamera()
+                    scrollIntoView("imgContainer")
                 } else {
                     toast.error("Could not get canvas context")
                 }
@@ -172,7 +163,6 @@ export default function DetectPage() {
             }
 
             const data = await response.json()
-            console.log(data)
 
             if (data.result.is_plant.binary === false) {
                 toast.error("No plant detected in the image")
@@ -181,7 +171,6 @@ export default function DetectPage() {
             setDiseasePrediction(data.result.disease.suggestions)
 
             toast.success("Disease detection completed!")
-            scrollIntoView("results")
         } catch (error) {
             toast.error("Error detecting disease")
             console.error(error)
@@ -197,6 +186,18 @@ export default function DetectPage() {
             }
         }
     }, [cameraStream])
+
+    useEffect(() => {
+        if (selectedImage) {
+            // Use setTimeout to ensure the DOM has updated
+            setTimeout(() => {
+                const element = document.getElementById("imgContainer");
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                }
+            }, 100); // Short delay to ensure render completes
+        }
+    }, [selectedImage]);
 
     return (
         <div className="max-w-4xl mx-auto lg:px-0 px-4 py-8 md:py-12">
@@ -273,7 +274,7 @@ export default function DetectPage() {
 
             {/* Image Preview and Detection */}
             {selectedImage && (
-                <div className="mt-8 grid gap-6 md:grid-cols-2" id="imgContainer">
+                <div className="mt-8 md:w-1/2 mx-auto" id="imgContainer">
                     <Card>
                         <CardHeader className="relative">
                             <CardTitle>Selected Image</CardTitle>
@@ -306,15 +307,15 @@ export default function DetectPage() {
                             </Button>
                         </CardContent>
                     </Card>
-
-                    {/* Disease Prediction */}
-                    {diseasePrediction && (
-                        <DiseaseResult
-                            diseases={diseasePrediction}
-                            onClose={() => setDiseasePrediction(null)}
-                        />
-                    )}
                 </div>
+            )}
+            {/* Disease Detection Modal */}
+            {diseasePrediction && (
+                <DiseaseResult
+                    isOpen={!!diseasePrediction}
+                    onClose={() => setDiseasePrediction(null)}
+                    diseases={diseasePrediction}
+                />
             )}
         </div>
     )
