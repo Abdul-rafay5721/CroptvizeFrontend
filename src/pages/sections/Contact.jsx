@@ -37,68 +37,23 @@ export default function ContactPage() {
                 </p>
             </div>
 
-            <div className="mx-auto mt-8 grid max-w-6xl gap-6 md:grid-cols-2 lg:gap-12">
-                {/* Contact Information */}
-                <div className="space-y-6">
-                    <div className="grid gap-6">
-                        {contactInfo.map((item) => (
-                            <Card key={item.title}>
-                                <CardHeader>
-                                    <div className="flex items-center gap-2">
-                                        <div className="rounded-lg bg-primary/10 p-2">
-                                            <item.icon className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <CardTitle>{item.title}</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <CardDescription>{item.details}</CardDescription>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-
-                    {/* Social Links */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Follow Us</CardTitle>
-                            <CardDescription>Stay connected on social media</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex gap-4">
-                                {socialLinks.map((social) => (
-                                    <a
-                                        key={social.name}
-                                        href={social.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="rounded-lg bg-primary/10 p-2 transition-colors hover:bg-primary/20"
-                                    >
-                                        <social.icon className="h-5 w-5 text-primary" />
-                                        <span className="sr-only">{social.name}</span>
-                                    </a>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* FAQs */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Frequently Asked Questions</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Accordion type="single" collapsible>
-                                {faqs.map((faq, index) => (
-                                    <AccordionItem key={index} value={`faq-${index}`}>
-                                        <AccordionTrigger>{faq.question}</AccordionTrigger>
-                                        <AccordionContent>{faq.answer}</AccordionContent>
-                                    </AccordionItem>
-                                ))}
-                            </Accordion>
-                        </CardContent>
-                    </Card>
-                </div>
+            <div className="mx-auto flex flex-col-reverse gap-6 lg:gap-8 mt-8 max-w-3xl">
+                {/* FAQs */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Frequently Asked Questions</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Accordion type="single" collapsible>
+                            {faqs.map((faq, index) => (
+                                <AccordionItem key={index} value={`faq-${index}`}>
+                                    <AccordionTrigger>{faq.question}</AccordionTrigger>
+                                    <AccordionContent>{faq.answer}</AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </CardContent>
+                </Card>
 
                 {/* Contact Form */}
                 <div>
@@ -135,38 +90,24 @@ export default function ContactPage() {
                                     <label htmlFor="message" className="text-sm font-medium">
                                         Message
                                     </label>
-                                    <Textarea id="message" placeholder="Enter your message" required disabled={isLoading} rows={6} />
+                                    <Textarea id="message" placeholder="Enter your message" required disabled={isLoading} rows={8} />
                                 </div>
-                                <Button className="w-full" disabled={isLoading}>
-                                    {isLoading ? (
-                                        <>
-                                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                                            Sending...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Send Message
-                                            <Send className="ml-2 h-4 w-4" />
-                                        </>
-                                    )}
-                                </Button>
+                                <div className="w-full flex justify-end">
+                                    <Button disabled={isLoading}>
+                                        {isLoading ? (
+                                            <>
+                                                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                                Sending...
+                                            </>
+                                        ) : (
+                                            <>
+                                                Send Message
+                                                <Send className="ml-2 h-4 w-4" />
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
                             </form>
-                        </CardContent>
-                    </Card>
-
-                    {/* Map */}
-                    <Card className="mt-6 p-0">
-                        <CardContent className="py-0 px-0">
-                            <div className="w-full overflow-hidden rounded-lg">
-                                <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3172.3325395304414!2d-122.01116148467422!3d37.33463524513264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb59127ce078f%3A0x18e1c3ce7becf1b!2sApple%20Park!5e0!3m2!1sen!2sin!4v1637309850935!5m2!1sen!2sin"
-                                    width="100%"
-                                    height="330"
-                                    style={{ border: 0 }}
-                                    allowFullScreen
-                                    loading="lazy"
-                                ></iframe>
-                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -174,52 +115,6 @@ export default function ContactPage() {
         </div>
     )
 }
-
-const contactInfo = [
-    {
-        icon: MapPin,
-        title: "Our Location",
-        details: "123 Agriculture Street, Farmington, FA 12345",
-    },
-    {
-        icon: Phone,
-        title: "Phone",
-        details: "+1 (234) 567-8900\n+1 (234) 567-8901",
-    },
-    {
-        icon: Mail,
-        title: "Email",
-        details: "support@croptivize.com\ninfo@croptivize.com",
-    },
-    {
-        icon: Clock,
-        title: "Working Hours",
-        details: "Monday - Friday: 9:00 AM - 6:00 PM\nSaturday: 9:00 AM - 1:00 PM",
-    },
-]
-
-const socialLinks = [
-    {
-        name: "Facebook",
-        url: "https://facebook.com",
-        icon: Facebook,
-    },
-    {
-        name: "Twitter",
-        url: "https://twitter.com",
-        icon: Twitter,
-    },
-    {
-        name: "Instagram",
-        url: "https://instagram.com",
-        icon: Instagram,
-    },
-    {
-        name: "LinkedIn",
-        url: "https://linkedin.com",
-        icon: Linkedin,
-    },
-]
 
 const faqs = [
     {

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 import { Leaf, Menu, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -31,15 +31,23 @@ export default function Navbar() {
         <>
             {NAVIGATION_ITEMS.map((item) => (
                 <NavigationMenuItem key={item.path}>
-                    <Link
+                    <NavLink
                         to={item.path}
                         onClick={() => mobile && setIsOpen(false)}
-                        className={mobile ? "block w-full rounded-md" : undefined}
+                        className={({ isActive }) =>
+                            isActive
+                                ? mobile
+                                    ? "block w-full rounded-md text-primary"
+                                    : "text-primary"
+                                : mobile
+                                    ? "block w-full rounded-md"
+                                    : undefined
+                        }
                     >
                         <NavigationMenuLink className={`${mobile ? undefined : navigationMenuTriggerStyle()} bg-transparent`}>
                             {item.name}
                         </NavigationMenuLink>
-                    </Link>
+                    </NavLink>
                 </NavigationMenuItem>
             ))}
         </>

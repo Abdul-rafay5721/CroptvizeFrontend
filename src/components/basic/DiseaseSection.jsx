@@ -30,7 +30,7 @@ export default function DiseasePreview() {
     return (
         <section className="max-w-7xl mx-auto px-4 xl:px-2 py-12 md:py-16">
             <div className="mx-auto max-w-[58rem] text-center">
-                <h2 className="text-4xl font-bold tracking-tight text-primary sm:text-5xl">
+                <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">
                     Personal plant doctor in your pocket
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground">
