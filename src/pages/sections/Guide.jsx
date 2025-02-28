@@ -6,8 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
+import { useLocation } from "react-router-dom"
 
 export default function Guide() {
+    const location = useLocation()
     const [weather, setWeather] = useState(null)
     const [loading, setLoading] = useState(true)
 
@@ -75,6 +77,16 @@ export default function Guide() {
         }
     }
 
+    useEffect(() => {
+        if (location.hash) {
+            const elementId = location.hash.substring(1)
+            const element = document.getElementById(elementId)
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" })
+            }
+        }
+    }, [])
+
     return (
         <div className="max-w-7xl mx-auto px-4 xl:px-2 py-8">
             <h1 className="text-3xl font-bold mb-6">Farming Guide</h1>
@@ -132,7 +144,7 @@ export default function Guide() {
 
                 {/* Weather Sidebar */}
                 <div className="space-y-4">
-                    <Card>
+                    <Card id="weather">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <ThermometerSun className="h-5 w-5" />

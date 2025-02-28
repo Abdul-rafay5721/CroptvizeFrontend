@@ -67,7 +67,7 @@ export default function Shop() {
                 {/* Search and Sort - Desktop */}
                 <div className="hidden gap-4 md:flex">
                     <div className="relative">
-                        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input placeholder="Search products..." className="w-[300px] pl-9" />
                     </div>
                     <Select defaultValue="featured">

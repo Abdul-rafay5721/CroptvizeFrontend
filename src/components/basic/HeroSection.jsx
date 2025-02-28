@@ -35,10 +35,10 @@ export default function HeroSection() {
                 </div>
 
             </div>
-            <div className="absolute top-0 right-0 z-[-1] xl:opacity-100 opacity-50 md:block hidden">
+            <div className="absolute top-0 right-0 2xl:right-14 z-[-1] xl:opacity-100 opacity-50 md:block hidden">
                 <img src={pic} className="" />
             </div>
-            <div className="absolute top-0 md:left-0 sm:left-1/4 left-1/2 sm:-translate-x-0 -translate-x-1/2 z-[-1] xl:opacity-100 sm:opacity-50 opacity-35">
+            <div className="absolute top-0 2xl:left-14 md:left-0 sm:left-1/4 left-1/2 sm:-translate-x-0 -translate-x-1/2 z-[-1] xl:opacity-100 sm:opacity-50 opacity-35">
                 <img src={pic} className="sm:h-auto h-[300px] sm:w-auto w-[400px]" />
             </div>
         </div>
