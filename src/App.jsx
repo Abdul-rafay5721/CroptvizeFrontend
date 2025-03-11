@@ -7,6 +7,8 @@ import ContactPage from './pages/sections/Contact'
 import Guide from './pages/sections/Guide'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
+import AdminLayout from './layout/AdminLayout'
+import Dashboard from './pages/dashboard/Dashboard'
 import { Toaster } from './components/ui/sonner'
 import './App.css'
 
@@ -36,6 +38,16 @@ function App() {
         {
           path: "/guide",
           element: <Guide />
+        },
+      ]
+    },
+    {
+      path: "/dashboard",
+      element: <AdminLayout />,
+      children: [
+        {
+          path: "/dashboard",
+          element: <Dashboard />
         },
       ]
     },
