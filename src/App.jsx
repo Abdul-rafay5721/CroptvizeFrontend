@@ -9,6 +9,9 @@ import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import AdminLayout from './layout/AdminLayout'
 import Dashboard from './pages/dashboard/Dashboard'
+import Products from './pages/dashboard/Products'
+import Orders from './pages/dashboard/Orders'
+import Customers from './pages/dashboard/Customers'
 import { Toaster } from './components/ui/sonner'
 import './App.css'
 
@@ -49,6 +52,18 @@ function App() {
           path: "/dashboard",
           element: <Dashboard />
         },
+        {
+          path: "/dashboard/products",
+          element: <Products />
+        },
+        {
+          path: "/dashboard/orders",
+          element: <Orders />
+        },
+        {
+          path: "/dashboard/customers",
+          element: <Customers />
+        }
       ]
     },
     {
