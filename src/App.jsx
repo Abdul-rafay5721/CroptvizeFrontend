@@ -1,4 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import store from './redux/store'
 import UserLayout from './layout/UserLayout'
 import Home from './pages/sections/Home'
 import DetectPage from './pages/sections/DetectDisease'
@@ -78,8 +80,10 @@ function App() {
 
   return (
     <>
-      <RouterProvider router={router} />
-      <Toaster />
+      <Provider store={store}>
+        <RouterProvider router={router} />
+        <Toaster />
+      </Provider>
     </>
   )
 }
