@@ -1,32 +1,47 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Eye, EyeOff, Leaf } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
+import { useLoginMutation } from "../../services/authApi"
 
 export default function Login() {
-    const [isLoading, setIsLoading] = useState(false)
+    const navigate = useNavigate()
     const [showPassword, setShowPassword] = useState(false)
+
+    const [form, setForm] = useState({
+        email: "",
+        password: "",
+    })
+    const [login, { isLoading }] = useLoginMutation()
 
     async function onSubmit(event) {
         event.preventDefault()
-        setIsLoading(true)
+        if (!form.email || !form.password) {
+            toast("Please fill in all fields")
+            return
+        }
 
-        // TODO: Implement actual login logic
-        setTimeout(() => {
-            setIsLoading(false)
-            toast("Logged in successfully")
-        }, 1000)
+        try {
+            const response = await login(form).unwrap()
+            toast.success("Logged in successfully")
+            setForm({ email: "", password: "" })
+            localStorage.setItem('user', JSON.stringify(response?.data?.user))
+            localStorage.setItem('accessToken', response?.data?.accessToken)
+            localStorage.setItem('refreshToken', response?.data?.refreshToken)
+            navigate("/")
+        } catch (error) {
+            const err = error.data.message || 'Invalid credentials'
+            toast.error(err)
+        }
     }
 
     const handleGoogleLogin = async () => {
-        setIsLoading(true)
         // TODO: Implement Google login
         setTimeout(() => {
-            setIsLoading(false)
             toast("Logged in with Google successfully")
         }, 1000)
     }
@@ -48,6 +63,8 @@ export default function Login() {
                                 id="email"
                                 placeholder="name@example.com"
                                 type="text"
+                                value={form.email}
+                                onChange={(e) => setForm({ ...form, email: e.target.value })}
                                 autoCapitalize="none"
                                 autoComplete="email"
                                 autoCorrect="off"
@@ -62,6 +79,8 @@ export default function Login() {
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     autoCapitalize="none"
+                                    value={form.password}
+                                    onChange={(e) => setForm({ ...form, password: e.target.value })}
                                     autoComplete="current-password"
                                     disabled={isLoading}
                                     required

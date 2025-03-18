@@ -13,9 +13,27 @@ export const authApi = createApi({
                 body: credentials,
             }),
         }),
+        register: builder.mutation({
+            query: (credentials) => ({
+                url: "/user/register",
+                method: "POST",
+                body: credentials,
+            }),
+        }),
+        logout: builder.mutation({
+            query: () => ({
+                url: "/user/logout",
+                method: "POST",
+                headers: new Headers({
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                }),
+            }),
+        }),
     }),
 })
 
 export const {
-    useLoginMutation
+    useLoginMutation,
+    useRegisterMutation,
+    useLogoutMutation
 } = authApi

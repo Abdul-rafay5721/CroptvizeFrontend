@@ -4,7 +4,7 @@ import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function DiseasePreview() {
+const DiseasePreview = () => {
     const [isLoading, startTransition] = useTransition()
     const [diseases, setDiseases] = useState([])
 
@@ -64,7 +64,7 @@ export default function DiseasePreview() {
                                 </CardHeader>
                             </Card>
                         ))
-                    : diseases.map((disease) => (
+                    : diseases?.map((disease) => (
                         <Card key={disease.id} className="overflow-hidden pt-0 pb-4">
                             {disease.images?.[0] && (
                                 <div className="relative">
@@ -92,4 +92,6 @@ export default function DiseasePreview() {
         </section>
     )
 }
+
+export default DiseasePreview
 
