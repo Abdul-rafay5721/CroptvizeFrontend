@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import ProductForm from "./ProductForm"
 
 // Format price for display
@@ -40,6 +41,7 @@ export default function ProductModals({
     selectedProduct,
     formData,
     handleInputChange,
+    handleImageChange,
     handleSelectChange,
     handleCheckboxChange,
     handleAddProduct,
@@ -58,17 +60,22 @@ export default function ProductModals({
                 setIsAddModalOpen(open);
                 if (!open) resetForm();
             }}>
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent className="sm:max-w-[600px] max-h-[92vh]">
                     <DialogHeader>
                         <DialogTitle>Add New Product</DialogTitle>
                         <DialogDescription>Fill in the details to add a new product to your inventory.</DialogDescription>
                     </DialogHeader>
-                    <ProductForm
-                        formData={formData}
-                        handleInputChange={handleInputChange}
-                        handleSelectChange={handleSelectChange}
-                        handleCheckboxChange={handleCheckboxChange}
-                    />
+                    <ScrollArea className="flex-1 max-h-[calc(92vh-9.5rem)] px-2">
+                        <div className="py-2">
+                            <ProductForm
+                                formData={formData}
+                                handleInputChange={handleInputChange}
+                                handleSelectChange={handleSelectChange}
+                                handleCheckboxChange={handleCheckboxChange}
+                                handleImageChange={handleImageChange}
+                            />
+                        </div>
+                    </ScrollArea>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
                             Cancel
@@ -113,16 +120,19 @@ export default function ProductModals({
                                         <Star className="h-5 w-5 fill-primary text-primary" />
                                         <span className="font-medium">{selectedProduct.rating.toFixed(1)}</span>
                                     </div>
-                                    <div className="text-2xl font-bold text-primary">{formatPrice(selectedProduct.price)}</div>
+                                    <div className="text-2xl font-bold text-primary mb-1">{formatPrice(selectedProduct.price)}</div>
+                                    <div className="mb-1">
+                                        <a href={selectedProduct.link} className="underline text-blue-500" target="_blank">Link</a>
+                                    </div>
                                     <div>
                                         <h4 className="font-medium mb-1">Description</h4>
-                                        <p className="text-muted-foreground">{selectedProduct.description}</p>
+                                        <p className="text-sm text-muted-foreground line-clamp-3">{selectedProduct.description}</p>
                                     </div>
                                     <div className="text-sm text-muted-foreground">Added on {formatDate(selectedProduct.createdAt)}</div>
                                 </div>
                             </div>
                         </div>
-                        <DialogFooter className="gap-2 sm:gap-0">
+                        <DialogFooter className="gap-2">
                             <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
                                 Close
                             </Button>
@@ -150,13 +160,18 @@ export default function ProductModals({
                         <DialogTitle>Edit Product</DialogTitle>
                         <DialogDescription>Update the product details.</DialogDescription>
                     </DialogHeader>
-                    <ProductForm
-                        formData={formData}
-                        handleInputChange={handleInputChange}
-                        handleSelectChange={handleSelectChange}
-                        handleCheckboxChange={handleCheckboxChange}
-                        isEditing={true}
-                    />
+                    <ScrollArea className="flex-1 max-h-[calc(92vh-9.5rem)] px-2">
+                        <div className="py-2">
+                            <ProductForm
+                                formData={formData}
+                                handleInputChange={handleInputChange}
+                                handleSelectChange={handleSelectChange}
+                                handleCheckboxChange={handleCheckboxChange}
+                                handleImageChange={handleImageChange}
+                                isEditing={true}
+                            />
+                        </div>
+                    </ScrollArea>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
                             Cancel

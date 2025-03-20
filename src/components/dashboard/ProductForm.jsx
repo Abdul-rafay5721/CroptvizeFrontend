@@ -3,11 +3,12 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import ImageInput from "../ui/ImageInput"
 
-export default function ProductForm({ formData, handleInputChange, handleSelectChange, handleCheckboxChange, isEditing = false }) {
+export default function ProductForm({ formData, handleInputChange, handleImageChange, handleSelectChange, handleCheckboxChange, isEditing = false }) {
     return (
-        <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 py-4 px-3">
+            <div className="grid md:grid-cols-2 gap-4">
                 <div className="grid gap-2">
                     <Label htmlFor={`${isEditing ? 'edit-' : ''}name`}>Product Name</Label>
                     <Input
@@ -42,7 +43,7 @@ export default function ProductForm({ formData, handleInputChange, handleSelectC
                     rows={3}
                 />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
                 <div className="grid gap-2">
                     <Label htmlFor={`${isEditing ? 'edit-' : ''}category`}>Category</Label>
                     <Select value={formData.category} onValueChange={(value) => handleSelectChange("category", value)}>
@@ -74,12 +75,23 @@ export default function ProductForm({ formData, handleInputChange, handleSelectC
                 </div>
             </div>
             <div className="grid gap-2">
-                <Label htmlFor={`${isEditing ? 'edit-' : ''}image`}>Image URL</Label>
-                <Input
+                <Label htmlFor={`${isEditing ? 'edit-' : ''}image`}>Image</Label>
+                <ImageInput
                     id={`${isEditing ? 'edit-' : ''}image`}
-                    name="image"
-                    placeholder="Enter image URL"
-                    value={formData.image || ""}
+                    value={formData.image}
+                    onChange={(value) => handleImageChange(value)}
+                    placeholder="Select an image"
+                    allowURL={false}
+                    previewSize={150}
+                />
+            </div>
+            <div className="grid gap-2">
+                <Label htmlFor={`${isEditing ? 'edit-' : ''}link`}>Product Link</Label>
+                <Input
+                    id={`${isEditing ? 'edit-' : ''}link`}
+                    name="link"
+                    placeholder="https://example.com"
+                    value={formData.link}
                     onChange={handleInputChange}
                 />
             </div>

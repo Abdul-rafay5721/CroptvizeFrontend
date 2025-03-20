@@ -7,11 +7,17 @@ export const productApi = createApi({
     tagTypes: ["Product"],
     endpoints: (builder) => ({
         addProduct: builder.mutation({
-            query: (body) => ({
-                url: "/product/createProduct",
-                method: "POST",
-                body,
-            }),
+            query: (body) => {
+                const formData = new FormData();
+                Object.entries(body).forEach(([key, value]) => {
+                    formData.append(key, value);
+                });
+                return {
+                    url: "/product/createProduct",
+                    method: "POST",
+                    body: formData,
+                }
+            },
             invalidatesTags: ["Product"],
         }),
         getProducts: builder.query({
@@ -29,30 +35,48 @@ export const productApi = createApi({
                 } = params;
 
                 // Build the query string with all parameters
-                let queryString = `/product/getProducts?page=${page}&limit=${limit}`;
+                let url = `/product/getProducts?page=${page}&limit=${limit}`;
 
-                if (search) queryString += `&search=${encodeURIComponent(search)}`;
-                if (category) queryString += `&category=${encodeURIComponent(category)}`;
-                if (sort) queryString += `&sort=${sort}`;
-                if (minPrice) queryString += `&minPrice=${minPrice}`;
-                if (maxPrice) queryString += `&maxPrice=${maxPrice}`;
-                if (minRating) queryString += `&minRating=${minRating}`;
-                if (featured) queryString += `&featured=${featured}`;
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+                if (category) url += `&category=${encodeURIComponent(category)}`;
+                if (sort) url += `&sort=${sort}`;
+                if (minPrice) url += `&minPrice=${minPrice}`;
+                if (maxPrice) url += `&maxPrice=${maxPrice}`;
+                if (minRating) url += `&minRating=${minRating}`;
+                if (featured) url += `&featured=${featured}`;
 
-                return queryString;
+                return {
+                    url,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    method: "GET",
+                };
             },
             providesTags: ["Product"],
         }),
         getProductById: builder.query({
-            query: (id) => `/product/getProduct/${id}`,
+            query: (id) => ({
+                url: `/product/getProduct/${id}`,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                method: "GET",
+            }),
             providesTags: ["Product"],
         }),
         updateProduct: builder.mutation({
-            query: ({ id, body }) => ({
-                url: `/product/updateProduct/${id}`,
-                method: "PUT",
-                body,
-            }),
+            query: ({ id, body }) => {
+                const formData = new FormData();
+                Object.entries(body).forEach(([key, value]) => {
+                    formData.append(key, value);
+                });
+                return {
+                    url: `/product/updateProduct/${id}`,
+                    method: "PUT",
+                    body: formData,
+                }
+            },
             invalidatesTags: ["Product"],
         }),
         deleteProduct: builder.mutation({

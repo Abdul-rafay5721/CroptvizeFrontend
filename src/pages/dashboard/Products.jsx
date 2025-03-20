@@ -44,13 +44,14 @@ export default function Products() {
         rating: 0,
         category: "Fertilizers",
         isFeatured: false,
+        link: ""
     })
 
     // Debounce search term
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(searchTerm);
-            setPage(1); // Reset to first page on new search
+            setPage(1);
         }, 500);
 
         return () => {
@@ -63,7 +64,7 @@ export default function Products() {
         page,
         limit,
         search: debouncedSearch,
-        category: selectedCategory === "all" ? "" : selectedCategory, // Convert "all" to empty string for API
+        category: selectedCategory === "all" ? "" : selectedCategory,
         sort: sortOption,
         minPrice: priceRange[0] > 0 ? priceRange[0] : undefined,
         maxPrice: priceRange[1] < 1000 ? priceRange[1] : undefined,
@@ -95,6 +96,15 @@ export default function Products() {
         }));
     };
 
+    // Handle Image change
+    const handleImageChange = (value) => {
+
+        setFormData((prev) => ({
+            ...prev,
+            image: value,
+        }));
+    };
+
     // Handle select changes
     const handleSelectChange = (name, value) => {
         setFormData((prev) => ({
@@ -113,12 +123,19 @@ export default function Products() {
 
     // Reset filters
     const resetFilters = () => {
-        setSelectedCategory("all"); // Changed from empty string to "all"
+        setSelectedCategory("all");
         setSortOption("newest");
         setPriceRange([0, 1000]);
         setMinRating(0);
         setIsFeatured(false);
         setPage(1);
+    };
+
+    const handleModalOpen = () => {
+        resetForm();
+        setSelectedProduct(null);
+        setSelectedProductId(null);
+        setIsAddModalOpen(true);
     };
 
     // Handle add product
@@ -212,6 +229,7 @@ export default function Products() {
             rating: product.rating,
             category: product.category,
             isFeatured: product.isFeatured,
+            link: product.link
         });
         setIsEditModalOpen(true);
     };
@@ -223,7 +241,7 @@ export default function Products() {
     };
 
     // Get pagination information from API response
-    const pagination = data?.pagination || {
+    const pagination = data?.data?.pagination || {
         totalDocs: 0,
         limit: 10,
         totalPages: 0,
@@ -232,7 +250,7 @@ export default function Products() {
         hasNextPage: false,
     };
 
-    const products = data?.products || [];
+    const products = data?.data?.products || [];
     const loading = isLoading || isFetching;
 
     return (
@@ -242,7 +260,7 @@ export default function Products() {
                     <h2 className="text-3xl font-bold tracking-tight">Products</h2>
                     <p className="text-muted-foreground">Manage your product inventory</p>
                 </div>
-                <Button onClick={() => setIsAddModalOpen(true)}>
+                <Button onClick={handleModalOpen}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Product
                 </Button>
@@ -291,6 +309,7 @@ export default function Products() {
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSelectChange={handleSelectChange}
+                handleImageChange={handleImageChange}
                 handleCheckboxChange={handleCheckboxChange}
                 handleAddProduct={handleAddProduct}
                 handleEditProduct={handleEditProduct}
@@ -301,6 +320,10 @@ export default function Products() {
                 isUpdatingProduct={isUpdatingProduct}
                 isDeletingProduct={isDeletingProduct}
             />
+            {/* <div>
+                <input type="file" accept="image/*" onChange={(e) => console.log(e.target.files)
+                } />
+            </div> */}
         </div>
     );
 }
