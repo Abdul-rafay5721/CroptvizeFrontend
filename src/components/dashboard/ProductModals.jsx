@@ -99,7 +99,7 @@ export default function ProductModals({
                             <div className="flex flex-col md:flex-row gap-6">
                                 <div className="md:w-1/3">
                                     <img
-                                        src={selectedProduct.image || "/placeholder.svg?height=200&width=200"}
+                                        src={selectedProduct.image || "/placeholder.jpg"}
                                         alt={selectedProduct.name}
                                         className="w-full h-auto rounded-md border object-cover aspect-square"
                                     />

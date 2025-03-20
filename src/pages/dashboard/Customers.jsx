@@ -1,160 +1,63 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { ChevronLeft, ChevronRight, Loader2, Check } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useGetUsersQuery, useUpdateRoleMutation } from "../../services/userApi"
 import { toast } from "sonner"
 
-// Mock data for users
-const mockUsers = [
-    {
-        id: "USR-001",
-        email: "john.smith@example.com",
-        phone: "+1 (555) 123-4567",
-        role: "user",
-        joinedOn: "2023-01-15T10:30:00Z",
-    },
-    {
-        id: "USR-002",
-        email: "sarah.johnson@example.com",
-        phone: "+1 (555) 234-5678",
-        role: "admin",
-        joinedOn: "2023-01-20T14:20:00Z",
-    },
-    {
-        id: "USR-003",
-        email: "michael.brown@example.com",
-        phone: "+1 (555) 345-6789",
-        role: "user",
-        joinedOn: "2023-02-05T09:15:00Z",
-    },
-    {
-        id: "USR-004",
-        email: "emily.davis@example.com",
-        phone: "+1 (555) 456-7890",
-        role: "user",
-        joinedOn: "2023-02-12T16:45:00Z",
-    },
-    {
-        id: "USR-005",
-        email: "david.wilson@example.com",
-        phone: "+1 (555) 567-8901",
-        role: "user",
-        joinedOn: "2023-02-18T11:10:00Z",
-    },
-    {
-        id: "USR-006",
-        email: "jennifer.taylor@example.com",
-        phone: "+1 (555) 678-9012",
-        role: "user",
-        joinedOn: "2023-03-01T13:25:00Z",
-    },
-    {
-        id: "USR-007",
-        email: "robert.anderson@example.com",
-        phone: "+1 (555) 789-0123",
-        role: "user",
-        joinedOn: "2023-03-10T10:05:00Z",
-    },
-    {
-        id: "USR-008",
-        email: "lisa.martinez@example.com",
-        phone: "+1 (555) 890-1234",
-        role: "admin",
-        joinedOn: "2023-03-15T15:30:00Z",
-    },
-    {
-        id: "USR-009",
-        email: "daniel.thomas@example.com",
-        phone: "+1 (555) 901-2345",
-        role: "user",
-        joinedOn: "2023-03-22T09:40:00Z",
-    },
-    {
-        id: "USR-010",
-        email: "jessica.white@example.com",
-        phone: "+1 (555) 012-3456",
-        role: "user",
-        joinedOn: "2023-04-01T14:15:00Z",
-    },
-    {
-        id: "USR-011",
-        email: "christopher.harris@example.com",
-        phone: "+1 (555) 123-4567",
-        role: "user",
-        joinedOn: "2023-04-10T11:20:00Z",
-    },
-    {
-        id: "USR-012",
-        email: "amanda.clark@example.com",
-        phone: "+1 (555) 234-5678",
-        role: "user",
-        joinedOn: "2023-04-18T16:10:00Z",
-    },
-    {
-        id: "USR-013",
-        email: "matthew.lewis@example.com",
-        phone: "+1 (555) 345-6789",
-        role: "user",
-        joinedOn: "2023-05-05T13:45:00Z",
-    },
-    {
-        id: "USR-014",
-        email: "olivia.walker@example.com",
-        phone: "+1 (555) 456-7890",
-        role: "user",
-        joinedOn: "2023-05-12T10:30:00Z",
-    },
-    {
-        id: "USR-015",
-        email: "andrew.young@example.com",
-        phone: "+1 (555) 567-8901",
-        role: "user",
-        joinedOn: "2023-05-20T15:20:00Z",
-    },
-]
-
 export default function Customers() {
-    // State for users data
-    const [users, setUsers] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [roleLoading, setRoleLoading] = useState(null)
-
     // State for pagination
-    const [currentPage, setCurrentPage] = useState(1)
-    const [totalPages, setTotalPages] = useState(1)
-    const [itemsPerPage] = useState(10)
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(10)
 
-    // Load users on component mount
-    useEffect(() => {
-        // Simulate API call
-        setTimeout(() => {
-            setUsers(mockUsers)
-            setTotalPages(Math.ceil(mockUsers.length / itemsPerPage))
-            setLoading(false)
-        }, 1000)
-    }, [itemsPerPage])
+    // Track user being updated
+    const [updatingUserId, setUpdatingUserId] = useState(null)
 
-    // Get current users for pagination
-    const getCurrentUsers = () => {
-        const indexOfLastItem = currentPage * itemsPerPage
-        const indexOfFirstItem = indexOfLastItem - itemsPerPage
-        return users.slice(indexOfFirstItem, indexOfLastItem)
-    }
+    // Fetch users data using RTK Query
+    const {
+        data: usersResponse,
+        isLoading
+    } = useGetUsersQuery({
+        page,
+        limit
+    });
+
+    // Mutation hook for updating user role
+    const [updateRole, { isLoading: isRoleUpdating }] = useUpdateRoleMutation();
+
+    // Extract users from response
+    const users = usersResponse?.data || [];
+    const totalUsers = users.length || 0;
+
+    // Calculate total pages - this should come from API pagination in a real app
+    const totalPages = Math.max(1, Math.ceil(totalUsers / limit));
+
+    // Combined loading state
+    const loading = isLoading;
 
     // Handle role change
-    const handleRoleChange = (userId, newRole) => {
-        setRoleLoading(userId)
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            setUpdatingUserId(userId);
 
-        // Simulate API call
-        setTimeout(() => {
-            const updatedUsers = users.map((user) => (user.id === userId ? { ...user, role: newRole } : user))
-            setUsers(updatedUsers)
-            setRoleLoading(null)
-            toast.success(`User role updated to ${newRole}`)
-        }, 1000)
-    }
+            const result = await updateRole({
+                userId,
+                role: newRole
+            }).unwrap();
+
+            if (result.success) {
+                toast.success(`User role updated to ${newRole}`);
+            } else {
+                toast.error(result.message || "Failed to update role");
+            }
+        } catch (error) {
+            toast.error(error.data?.message || "An error occurred while updating role");
+        } finally {
+            setUpdatingUserId(null);
+        }
+    };
 
     // Format date
     const formatDate = (dateString) => {
@@ -162,8 +65,13 @@ export default function Customers() {
             year: "numeric",
             month: "short",
             day: "numeric",
-        })
-    }
+        });
+    };
+
+    // Get full name
+    const getFullName = (user) => {
+        return `${user.firstName} ${user.lastName}`;
+    };
 
     return (
         <div className="space-y-6">
@@ -177,6 +85,7 @@ export default function Customers() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>Name</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Phone</TableHead>
                                 <TableHead>Role</TableHead>
@@ -186,27 +95,28 @@ export default function Customers() {
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center">
+                                    <TableCell colSpan={5} className="h-24 text-center">
                                         <div className="flex items-center justify-center">
                                             <Loader2 className="h-6 w-6 animate-spin text-primary" />
                                             <span className="ml-2">Loading customers...</span>
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            ) : getCurrentUsers().length === 0 ? (
+                            ) : users.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center">
+                                    <TableCell colSpan={5} className="h-24 text-center">
                                         No customers found.
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                getCurrentUsers().map((user) => (
-                                    <TableRow key={user.id}>
-                                        <TableCell className="font-medium">{user.email}</TableCell>
+                                users.map((user) => (
+                                    <TableRow key={user._id}>
+                                        <TableCell className="font-medium">{getFullName(user)}</TableCell>
+                                        <TableCell>{user.email}</TableCell>
                                         <TableCell>{user.phone}</TableCell>
                                         <TableCell>
                                             <div className="w-[110px]">
-                                                {roleLoading === user.id ? (
+                                                {updatingUserId === user._id || (isRoleUpdating && updatingUserId === user._id) ? (
                                                     <div className="flex items-center space-x-2">
                                                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
                                                         <span className="text-sm">Updating...</span>
@@ -214,7 +124,7 @@ export default function Customers() {
                                                 ) : (
                                                     <Select
                                                         value={user.role}
-                                                        onValueChange={(value) => handleRoleChange(user.id, value)}
+                                                        onValueChange={(value) => handleRoleChange(user._id, value)}
                                                     >
                                                         <SelectTrigger className="h-8">
                                                             <SelectValue />
@@ -237,7 +147,7 @@ export default function Customers() {
                                                 )}
                                             </div>
                                         </TableCell>
-                                        <TableCell>{formatDate(user.joinedOn)}</TableCell>
+                                        <TableCell>{formatDate(user.createdAt)}</TableCell>
                                     </TableRow>
                                 ))
                             )}
@@ -246,34 +156,35 @@ export default function Customers() {
                 </CardContent>
                 <CardFooter className="flex items-center justify-between border-t p-4">
                     <div className="text-sm text-muted-foreground">
-                        Showing {getCurrentUsers().length} of {users.length} customers
+                        Showing {users.length} of {totalUsers} customers
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                            <span className="sr-only">Previous Page</span>
-                        </Button>
-                        <div className="text-sm font-medium">
-                            Page {currentPage} of {totalPages}
+                    {totalPages > 1 && (
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={page === 1 || loading}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                                <span className="sr-only">Previous Page</span>
+                            </Button>
+                            <div className="text-sm font-medium">
+                                Page {page} of {totalPages}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={page === totalPages || loading}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="sr-only">Next Page</span>
+                            </Button>
                         </div>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                            <span className="sr-only">Next Page</span>
-                        </Button>
-                    </div>
+                    )}
                 </CardFooter>
             </Card>
         </div>
     )
 }
-

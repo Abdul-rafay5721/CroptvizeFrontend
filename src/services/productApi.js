@@ -86,6 +86,18 @@ export const productApi = createApi({
             }),
             invalidatesTags: ["Product"],
         }),
+        addOrder: builder.mutation({
+            query: (id) => ({
+                url: `/product/addOrder/${id}`,
+                method: "POST",
+            })
+        }),
+        getOrders: builder.query({
+            query: () => ({
+                url: "/product/getOrders",
+                method: "GET",
+            }),
+        }),
     }),
 })
 
@@ -95,4 +107,6 @@ export const {
     useGetProductByIdQuery,
     useUpdateProductMutation,
     useDeleteProductMutation,
+    useAddOrderMutation,
+    useGetOrdersQuery,
 } = productApi

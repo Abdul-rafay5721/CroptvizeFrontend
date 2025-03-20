@@ -32,7 +32,12 @@ export default function Login() {
             localStorage.setItem('user', JSON.stringify(response?.data?.user))
             localStorage.setItem('accessToken', response?.data?.accessToken)
             localStorage.setItem('refreshToken', response?.data?.refreshToken)
-            navigate("/")
+            const role = response?.data?.user?.role
+            if (role === 'admin') {
+                navigate("/dashboard")
+            } else {
+                navigate("/")
+            }
         } catch (error) {
             const err = error.data.message || 'Invalid credentials'
             toast.error(err)
