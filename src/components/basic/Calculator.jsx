@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
+import useAuth from "@/hooks/useAuth"
 
 // Fertilizer data for different crops (kg/ha)
 const fertilizerData = [
@@ -81,12 +82,17 @@ const maxValues = {
 }
 
 export default function CalculatorComp() {
+    const { isAuthenticated } = useAuth()
     const [selectedCrop, setSelectedCrop] = useState("")
     const [area, setArea] = useState("")
     const [result, setResult] = useState(null)
     const [error, setError] = useState(null)
 
     const handleCalculate = () => {
+        if (!isAuthenticated) {
+            setError("Please login to use this feature")
+            return
+        }
         // Reset error
         setError(null)
 

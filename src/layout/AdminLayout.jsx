@@ -1,8 +1,14 @@
 import Sidebar from "@/components/common/Sidebar"
 import Header from "@/components/common/Header"
-import { Outlet } from "react-router-dom"
+import { Outlet, Navigate } from "react-router-dom"
+import useAuth from "@/hooks/useAuth"
 
 export default function AdminLayout() {
+    const { user } = useAuth()
+    if (user.role !== "admin") {
+        return <Navigate to="/" />
+    }
+
     return (
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar />

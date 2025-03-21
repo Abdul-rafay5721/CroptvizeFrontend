@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, Navigate } from "react-router-dom"
 import { Eye, EyeOff, Leaf } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,8 +7,11 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { useRegisterMutation } from "../../services/authApi"
+import useAuth from "@/hooks/useAuth"
+import { baseURL } from "../../utils/baseURL"
 
 export default function Signup() {
+    const { isAuthenticated } = useAuth()
     const navigate = useNavigate()
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -62,11 +65,44 @@ export default function Signup() {
 
     }
 
-    const handleGoogleSignup = async () => {
-        // TODO: Implement Google signup
-        setTimeout(() => {
-            toast("Signed up with Google successfully")
-        }, 1000)
+    const handleGoogleSignup = () => {
+        // Open Google OAuth in a popup
+        const googleAuthUrl = `${baseURL}/user/auth/google`;
+        const newWindow = window.open(googleAuthUrl, '_blank', 'width=500,height=600');
+
+        if (!newWindow) {
+            toast.error("Popup blocked by browser. Please allow popups for this site.");
+            return;
+        }
+
+        // Listen for message from popup window
+        window.addEventListener('message', function handleAuthMessage(event) {
+            const data = event.data;
+
+            // Process the returned data
+            if (data && data.user) {
+                // Store user data and tokens in localStorage
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('refreshToken', data.refreshToken);
+
+                toast.success("Logged in with Google successfully");
+
+                // Navigate based on role
+                if (data.user.role === 'admin') {
+                    navigate("/dashboard", { replace: true });
+                } else {
+                    navigate("/", { replace: true });
+                }
+
+                // Remove event listener after use
+                window.removeEventListener('message', handleAuthMessage);
+            }
+        });
+    };
+
+    if (isAuthenticated) {
+        return <Navigate to="/" />;
     }
 
     return (
