@@ -34,9 +34,9 @@ export default function Login() {
             localStorage.setItem('refreshToken', response?.data?.refreshToken)
             const role = response?.data?.user?.role
             if (role === 'admin') {
-                navigate("/dashboard")
+                navigate("/dashboard", { replace: true })
             } else {
-                navigate("/")
+                navigate("/", { replace: true })
             }
         } catch (error) {
             const err = error.data.message || 'Invalid credentials'

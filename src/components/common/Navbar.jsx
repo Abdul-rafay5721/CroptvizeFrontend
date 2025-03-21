@@ -148,6 +148,16 @@ export default function Navbar() {
                                             <NavItems mobile />
                                         </NavigationMenuList>
                                     </NavigationMenu>
+                                    {!isAuthenticated && (
+                                        <div className="mt-7 flex flex-col gap-3">
+                                            <Button variant="outline" asChild>
+                                                <Link to="/login">Login</Link>
+                                            </Button>
+                                            <Button asChild>
+                                                <Link to="/signup">Sign Up</Link>
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
                             </SheetContent>
                         </Sheet>
