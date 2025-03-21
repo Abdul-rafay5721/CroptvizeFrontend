@@ -7,6 +7,7 @@ import DetectPage from './pages/sections/DetectDisease'
 import Shop from './pages/sections/Shop'
 import ContactPage from './pages/sections/Contact'
 import Guide from './pages/sections/Guide'
+import FertilizerCalculator from './pages/sections/FertilizerCalculator'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import AdminLayout from './layout/AdminLayout'
@@ -44,6 +45,10 @@ function App() {
           path: "/guide",
           element: <Guide />
         },
+        {
+          path: "/fertilizer-calculator",
+          element: <FertilizerCalculator />
+        }
       ]
     },
     {
