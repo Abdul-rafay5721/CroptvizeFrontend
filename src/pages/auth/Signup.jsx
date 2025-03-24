@@ -66,39 +66,8 @@ export default function Signup() {
     }
 
     const handleGoogleSignup = () => {
-        // Open Google OAuth in a popup
-        const googleAuthUrl = `${baseURL}/user/auth/google`;
-        const newWindow = window.open(googleAuthUrl, '_blank', 'width=500,height=600');
-
-        if (!newWindow) {
-            toast.error("Popup blocked by browser. Please allow popups for this site.");
-            return;
-        }
-
-        // Listen for message from popup window
-        window.addEventListener('message', function handleAuthMessage(event) {
-            const data = event.data;
-
-            // Process the returned data
-            if (data && data.user) {
-                // Store user data and tokens in localStorage
-                localStorage.setItem('user', JSON.stringify(data.user));
-                localStorage.setItem('accessToken', data.accessToken);
-                localStorage.setItem('refreshToken', data.refreshToken);
-
-                toast.success("Logged in with Google successfully");
-
-                // Navigate based on role
-                if (data.user.role === 'admin') {
-                    navigate("/dashboard", { replace: true });
-                } else {
-                    navigate("/", { replace: true });
-                }
-
-                // Remove event listener after use
-                window.removeEventListener('message', handleAuthMessage);
-            }
-        });
+        localStorage.setItem('pendingGoogleAuth', 'true');
+        window.location.href = `${baseURL}/user/auth/google`;
     };
 
     if (isAuthenticated) {
