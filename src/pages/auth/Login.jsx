@@ -55,7 +55,7 @@ export default function Login() {
     };
 
     if (isAuthenticated) {
-        return user.role === 'admin' ? <Navigate to="/dashboard" replace /> : <Navigate to="/" replace />
+        return user?.role === 'admin' ? <Navigate to="/dashboard" replace /> : <Navigate to="/" replace />
     }
 
     return (

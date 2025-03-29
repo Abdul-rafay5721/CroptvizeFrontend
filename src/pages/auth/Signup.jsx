@@ -73,7 +73,7 @@ export default function Signup() {
     };
 
     if (isAuthenticated) {
-        return <Navigate to="/" />;
+        return <Navigate to="/" replace />;
     }
 
     return (
