@@ -31,6 +31,7 @@ import ProfileUpdateModal from "../basic/ProfileUpdateModal";
 const NAVIGATION_ITEMS = [
     { name: "Home", path: "/" },
     { name: "Disease Detection", path: "/detect" },
+    { name: "Fertilizer Calculator", path: "/fertilizer-calculator" },
     { name: "Shop", path: "/shop" },
     { name: "Guide", path: "/guide" },
     { name: "Contact", path: "/contact" },
@@ -91,7 +92,7 @@ export default function Navbar() {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-4">
+                    <div className="hidden lg:flex items-center space-x-2">
                         <NavigationMenu>
                             <NavigationMenuList>
                                 <NavItems />
@@ -123,7 +124,7 @@ export default function Navbar() {
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
-                            <div className="hidden md:flex items-center gap-4">
+                            <div className="hidden lg:flex items-center gap-4">
                                 <Button variant="ghost" asChild>
                                     <Link to="/login">Login</Link>
                                 </Button>
@@ -133,7 +134,7 @@ export default function Navbar() {
                             </div>
                         )}
                         {/* Mobile Navigation */}
-                        <div className="md:hidden">
+                        <div className="lg:hidden">
                             <Sheet open={isOpen} onOpenChange={setIsOpen}>
                                 <SheetTrigger asChild>
                                     <Button variant="ghost" size="icon">
