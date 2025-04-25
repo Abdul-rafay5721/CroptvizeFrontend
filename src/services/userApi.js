@@ -29,7 +29,13 @@ export const userApi = createApi({
             }),
             invalidatesTags: ["User"],
         }),
+        getUserCount: builder.query({
+            query: () => ({
+                url: "/user/count",
+                method: "GET",
+            }),
+        }),
     }),
 });
 
-export const { useGetUsersQuery, useUpdateRoleMutation, useUpdateUserMutation } = userApi;
+export const { useGetUsersQuery, useUpdateRoleMutation, useUpdateUserMutation, useGetUserCountQuery } = userApi;

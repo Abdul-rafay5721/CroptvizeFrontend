@@ -98,6 +98,13 @@ export const productApi = createApi({
                 method: "GET",
             }),
         }),
+        getAnalytics: builder.query({
+            query: () => ({
+                url: "/product/analytics",
+                method: "GET",
+            }),
+            providesTags: ["Product"],
+        }),
     }),
 })
 
@@ -109,4 +116,5 @@ export const {
     useDeleteProductMutation,
     useAddOrderMutation,
     useGetOrdersQuery,
+    useGetAnalyticsQuery,
 } = productApi

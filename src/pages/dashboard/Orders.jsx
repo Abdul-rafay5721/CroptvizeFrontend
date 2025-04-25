@@ -50,7 +50,11 @@ export default function Orders() {
 
     // Get customer full name
     const getCustomerName = (user) => {
-        return `${user.firstName} ${user.lastName}`;
+        if (user?.firstName) {
+            return `${user.firstName} ${user.lastName || ""}`
+        } else {
+            return "Not Found"
+        }
     }
 
     return (

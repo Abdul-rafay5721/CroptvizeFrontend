@@ -13,9 +13,9 @@ import { useGetProductsQuery } from '@/services/productApi'
 
 // Format price for display
 const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-PK", {
         style: "currency",
-        currency: "USD",
+        currency: "PKR",
     }).format(price)
 }
 

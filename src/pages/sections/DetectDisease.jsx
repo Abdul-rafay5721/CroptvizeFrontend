@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 import DiseaseResult from "../../components/basic/DiseaseResult"
-import { usePredictDiseaseMutation } from "../../services/diseaseApi"
+import { usePredictDiseaseMutation, useAddDiseaseMutation } from "../../services/diseaseApi"
+import useAuth from "../../hooks/useAuth"
+import { formatDiseaseName } from "@/lib/utils"
 
 export default function DetectPage() {
     const [selectedImage, setSelectedImage] = useState(null)
@@ -15,6 +17,7 @@ export default function DetectPage() {
     const videoRef = useRef(null)
     const fileInputRef = useRef(null)
     const containerRef = useRef(null)
+    const { isAuthenticated } = useAuth()
 
     const handleFileUpload = (event) => {
         event.preventDefault()
@@ -141,8 +144,14 @@ export default function DetectPage() {
     }
 
     const [predictDisease] = usePredictDiseaseMutation()
+    const [addDisease] = useAddDiseaseMutation()
+
     const detectDisease = async () => {
         if (!selectedImage) return
+        if (!isAuthenticated) {
+            toast.error("Please log in to use this feature")
+            return
+        }
 
         setIsLoading(true)
         try {
@@ -150,10 +159,25 @@ export default function DetectPage() {
             console.log("API Response:", response);
 
             const diseaseLabel = response?.data?.disease;
-
+            const confidence = response?.data?.confidence || 90;
             // Create the disease data structure based on the result
             const diseaseData = createDiseaseData(diseaseLabel);
             setDiseasePrediction([diseaseData]);
+
+            if (diseaseLabel && !diseaseLabel.includes('Cotton_Healthy')) {
+                const formattedName = formatDiseaseName(diseaseLabel);
+
+                try {
+                    await addDisease({
+                        name: formattedName,
+                        risk: confidence,
+                    }).unwrap();
+                    console.log("Disease saved to database");
+                } catch (saveError) {
+                    console.error("Error saving disease to database:", saveError);
+                    // Don't show error to user as the detection was still successful
+                }
+            }
 
             toast.success("Disease detection completed!")
         } catch (error) {

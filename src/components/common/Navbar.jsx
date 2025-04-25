@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, NavLink, useNavigate } from "react-router-dom"
-import { Leaf, Menu, X } from "lucide-react"
+import { Leaf, Menu, X, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     NavigationMenu,
@@ -73,12 +73,13 @@ export default function Navbar() {
     const handleLogout = async () => {
         try {
             await logout().unwrap()
-            useLogout()
-            toast.success("Logged out successfully")
-            navigate("/login")
         } catch (error) {
             const err = error.data.message || 'Error logging out! Please try again.'
             toast.error(err)
+        } finally {
+            useLogout()
+            toast.success("Logged out successfully")
+            navigate("/login")
         }
     }
 
@@ -103,26 +104,35 @@ export default function Navbar() {
                     {/* Desktop Auth Buttons */}
                     <div className="flex items-center space-x-2">
                         {isAuthenticated ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                                        <div className="h-9 w-9 p-3 rounded-full bg-primary/10 flex items-center justify-center">
-                                            <span className="text-sm font-medium text-primary">
-                                                {Array.from(user.firstName)[0]}
-                                                {Array.from(user.lastName)[0]}
-                                            </span>
-                                        </div>
+                            <>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                                            <div className="h-9 w-9 p-3 rounded-full bg-primary/10 flex items-center justify-center">
+                                                <span className="text-sm font-medium text-primary">
+                                                    {Array.from(user.firstName)[0]}
+                                                    {Array.from(user.lastName)[0]}
+                                                </span>
+                                            </div>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={() => setIsProfileModalOpen(true)}>
+                                            Profile
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>Logout</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                {user?.role === "admin" && (
+                                    <Button variant="ghost" asChild>
+                                        <Link to="/dashboard">
+                                            <LayoutDashboard className="h-5 w-5" />
+                                        </Link>
                                     </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => setIsProfileModalOpen(true)}>
-                                        Profile
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>Logout</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                )}
+                            </>
                         ) : (
                             <div className="hidden lg:flex items-center gap-4">
                                 <Button variant="ghost" asChild>

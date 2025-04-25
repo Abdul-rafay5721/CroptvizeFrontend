@@ -1,114 +1,61 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
-import { ArrowDown, ArrowUp, Bug, DollarSign, Package, ShoppingCart } from "lucide-react"
+import { ArrowDown, ArrowUp, Bug, Users, Package, ShoppingCart } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-
-// Mock data
-const salesData = [
-    { name: "Jan", total: 1200 },
-    { name: "Feb", total: 1900 },
-    { name: "Mar", total: 1500 },
-    { name: "Apr", total: 1700 },
-    { name: "May", total: 2500 },
-    { name: "Jun", total: 2300 },
-    { name: "Jul", total: 3000 },
-]
-
-const diseaseData = [
-    { name: "Rust", value: 35 },
-    { name: "Blight", value: 25 },
-    { name: "Powdery Mildew", value: 20 },
-    { name: "Leaf Spot", value: 15 },
-    { name: "Other", value: 5 },
-]
+import { useRecentDiseasesQuery, useAnalyticsQuery } from "@/services/diseaseApi"
+import { useGetUserCountQuery } from "../../services/userApi"
+import { useGetAnalyticsQuery } from "../../services/productApi"
 
 const COLORS = ["#0C6837", "#2E8B57", "#3CB371", "#66CDAA", "#8FBC8F"]
 
-const recentDetections = [
-    {
-        id: 1,
-        disease: "Rust",
-        plant: "Wheat",
-        confidence: 98,
-        date: "2023-07-15",
-        status: "High Risk",
-    },
-    {
-        id: 2,
-        disease: "Blight",
-        plant: "Potato",
-        confidence: 95,
-        date: "2023-07-14",
-        status: "High Risk",
-    },
-    {
-        id: 3,
-        disease: "Powdery Mildew",
-        plant: "Cucumber",
-        confidence: 87,
-        date: "2023-07-13",
-        status: "Medium Risk",
-    },
-    {
-        id: 4,
-        disease: "Leaf Spot",
-        plant: "Tomato",
-        confidence: 82,
-        date: "2023-07-12",
-        status: "Medium Risk",
-    },
-    {
-        id: 5,
-        disease: "Healthy",
-        plant: "Corn",
-        confidence: 99,
-        date: "2023-07-11",
-        status: "Healthy",
-    },
-]
-
-const recentOrders = [
-    {
-        id: "ORD-001",
-        customer: "John Smith",
-        product: "Organic Fertilizer",
-        amount: 49.99,
-        status: "Completed",
-    },
-    {
-        id: "ORD-002",
-        customer: "Sarah Johnson",
-        product: "Pest Control Kit",
-        amount: 79.99,
-        status: "Processing",
-    },
-    {
-        id: "ORD-003",
-        customer: "Michael Brown",
-        product: "Garden Tools Set",
-        amount: 129.99,
-        status: "Completed",
-    },
-    {
-        id: "ORD-004",
-        customer: "Emily Davis",
-        product: "Plant Health Monitor",
-        amount: 59.99,
-        status: "Shipped",
-    },
-    {
-        id: "ORD-005",
-        customer: "David Wilson",
-        product: "Seed Collection",
-        amount: 34.99,
-        status: "Processing",
-    },
-]
-
 export default function Dashboard() {
-    const [timeRange, setTimeRange] = useState("week")
+    const [diseaseData, setDiseaseData] = useState([])
+    const [totalDiseaseCount, setTotalDiseaseCount] = useState(0)
+    const [recentDetections, setRecentDetections] = useState([])
+    const [totalUsers, setTotalUsers] = useState(0)
+    const [totalOrders, setTotalOrders] = useState(0)
+    const [totalProducts, setTotalProducts] = useState(0)
+    const [recentOrders, setRecentOrders] = useState([])
+    const [salesData, setSalesData] = useState([])
+
+    const { data: userCountData } = useGetUserCountQuery()
+    const { data: analyticsData } = useAnalyticsQuery()
+    const { data: recentDiseasesData } = useRecentDiseasesQuery()
+    const { data: analytics } = useGetAnalyticsQuery()
+
+    useEffect(() => {
+        if (analyticsData) {
+            const formattedData = analyticsData.data.map((item) => ({
+                name: item.name,
+                value: item.count,
+            }))
+            setDiseaseData(formattedData)
+            setTotalDiseaseCount(analyticsData.data.length)
+        }
+    }, [analyticsData])
+
+    useEffect(() => {
+        if (recentDiseasesData) {
+            setRecentDetections(recentDiseasesData.data)
+        }
+    }, [recentDiseasesData])
+
+    useEffect(() => {
+        if (userCountData) {
+            setTotalUsers(userCountData.data)
+        }
+    }, [userCountData])
+
+    useEffect(() => {
+        if (analytics) {
+            setTotalOrders(analytics.data?.totalOrders || 0)
+            setTotalProducts(analytics.data?.totalProducts || 0)
+            setRecentOrders(analytics.data?.recentOrders || [])
+            setSalesData(analytics.data?.salesData || [])
+        }
+    }, [analytics])
 
     return (
         <div className="space-y-6">
@@ -125,11 +72,11 @@ export default function Dashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">$12,543.00</div>
+                        <div className="text-2xl font-bold">{totalUsers}</div>
                         <div className="flex items-center text-xs text-muted-foreground">
                             <ArrowUp className="mr-1 h-4 w-4 text-green-500" />
                             <span className="text-green-500">+12.5%</span> from last month
@@ -142,7 +89,7 @@ export default function Dashboard() {
                         <Package className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">245</div>
+                        <div className="text-2xl font-bold">{totalProducts}</div>
                         <div className="flex items-center text-xs text-muted-foreground">
                             <ArrowUp className="mr-1 h-4 w-4 text-green-500" />
                             <span className="text-green-500">+8.2%</span> from last month
@@ -155,7 +102,7 @@ export default function Dashboard() {
                         <ShoppingCart className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">432</div>
+                        <div className="text-2xl font-bold">{totalOrders}</div>
                         <div className="flex items-center text-xs text-muted-foreground">
                             <ArrowDown className="mr-1 h-4 w-4 text-red-500" />
                             <span className="text-red-500">-3.1%</span> from last month
@@ -168,7 +115,7 @@ export default function Dashboard() {
                         <Bug className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">1,293</div>
+                        <div className="text-2xl font-bold">{totalDiseaseCount}</div>
                         <div className="flex items-center text-xs text-muted-foreground">
                             <ArrowUp className="mr-1 h-4 w-4 text-green-500" />
                             <span className="text-green-500">+18.7%</span> from last month
@@ -179,21 +126,10 @@ export default function Dashboard() {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="lg:col-span-4">
-                    <CardHeader className="flex flex-row items-center justify-between">
+                    <CardHeader className="flex flex-row items-center">
                         <div>
                             <CardTitle>Sales Overview</CardTitle>
                             <CardDescription>Monthly revenue for the current year</CardDescription>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={() => setTimeRange("week")}>
-                                Week
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => setTimeRange("month")}>
-                                Month
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => setTimeRange("year")}>
-                                Year
-                            </Button>
                         </div>
                     </CardHeader>
                     <CardContent>
@@ -266,35 +202,49 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            {recentDetections.map((detection) => (
-                                <div key={detection.id} className="flex items-center justify-between rounded-lg border p-3">
-                                    <div className="flex items-center gap-4">
-                                        <div className="rounded-full bg-primary/10 p-2">
-                                            <Bug className="h-4 w-4 text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">{detection.disease}</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {detection.plant} • {detection.date}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm">{detection.confidence}%</span>
-                                        <Badge
-                                            variant={
-                                                detection.status === "High Risk"
-                                                    ? "destructive"
-                                                    : detection.status === "Medium Risk"
-                                                        ? "default"
-                                                        : "outline"
-                                            }
-                                        >
-                                            {detection.status}
-                                        </Badge>
-                                    </div>
+                            {recentDetections.length === 0 ? (
+                                <div className="flex items-center justify-center p-4">
+                                    <p className="text-center text-muted-foreground">No recent diseases found</p>
                                 </div>
-                            ))}
+                            ) : (
+                                recentDetections.map((detection) => (
+                                    <div key={detection._id} className="flex items-center justify-between rounded-lg border p-3">
+                                        <div className="flex items-center gap-4">
+                                            <div className="rounded-full bg-primary/10 p-2">
+                                                <Bug className="h-4 w-4 text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium">{detection.name}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    • {new Date(detection.createdAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm">{detection.risk}%</span>
+                                            <Badge
+                                                variant={
+                                                    Math.round(detection.risk) > 70
+                                                        ? "destructive"
+                                                        : Math.round(detection.risk) > 40
+                                                            ? "warning"
+                                                            : Math.round(detection.risk) > 20
+                                                                ? "default"
+                                                                : "outline"
+                                                }
+                                            >
+                                                {Math.round(detection.risk) > 70
+                                                    ? "High Risk"
+                                                    : Math.round(detection.risk) > 40
+                                                        ? "Medium Risk"
+                                                        : Math.round(detection.risk) > 20
+                                                            ? "Low Risk"
+                                                            : "No Risk"}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -306,31 +256,20 @@ export default function Dashboard() {
                     <CardContent>
                         <div className="space-y-4">
                             {recentOrders.map((order) => (
-                                <div key={order.id} className="flex items-center justify-between rounded-lg border p-3">
+                                <div key={order._id} className="flex items-center justify-between rounded-lg border p-3">
                                     <div className="flex items-center gap-4">
                                         <div className="rounded-full bg-primary/10 p-2">
                                             <ShoppingCart className="h-4 w-4 text-primary" />
                                         </div>
                                         <div>
-                                            <p className="font-medium">{order.product}</p>
+                                            <p className="font-medium line-clamp-2">{order.product?.name}</p>
                                             <p className="text-sm text-muted-foreground">
-                                                {order.customer} • {order.id}
+                                                {order.order_no}
                                             </p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-sm">${order.amount}</span>
-                                        <Badge
-                                            variant={
-                                                order.status === "Completed"
-                                                    ? "outline"
-                                                    : order.status === "Processing"
-                                                        ? "default"
-                                                        : "secondary"
-                                            }
-                                        >
-                                            {order.status}
-                                        </Badge>
+                                        <span className="text-sm">${order.product?.price}</span>
                                     </div>
                                 </div>
                             ))}

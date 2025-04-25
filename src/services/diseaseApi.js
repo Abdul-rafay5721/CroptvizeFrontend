@@ -19,7 +19,25 @@ export const diseaseApi = createApi({
                 body: disease,
             }),
         }),
+        analytics: builder.query({
+            query: () => ({
+                url: "/disease/diseaseAnalytics",
+                method: "GET",
+            }),
+        }),
+        recentDiseases: builder.query({
+            query: () => ({
+                url: "/disease/getRecent",
+                method: "GET",
+            }),
+        }),
+        getAll: builder.query({
+            query: () => ({
+                url: "/disease/getAll",
+                method: "GET",
+            }),
+        }),
     }),
 })
 
-export const { useAddDiseaseMutation, usePredictDiseaseMutation } = diseaseApi
+export const { useAddDiseaseMutation, usePredictDiseaseMutation, useAnalyticsQuery, useRecentDiseasesQuery, useGetAllQuery } = diseaseApi

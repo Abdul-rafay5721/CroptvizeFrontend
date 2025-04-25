@@ -16,6 +16,7 @@ import Dashboard from './pages/dashboard/Dashboard'
 import Products from './pages/dashboard/Products'
 import Orders from './pages/dashboard/Orders'
 import Customers from './pages/dashboard/Customers'
+import DiseasesPage from './pages/dashboard/Diseases'
 import { Toaster } from './components/ui/sonner'
 import { toast } from 'sonner'
 import './App.css'
@@ -73,6 +74,10 @@ function App() {
         {
           path: "/dashboard/customers",
           element: <Customers />
+        },
+        {
+          path: "/dashboard/diseases",
+          element: <DiseasesPage />
         }
       ]
     },

@@ -221,7 +221,7 @@ export default function DiseaseResult({ isOpen, onClose, diseases }) {
 
                                     {!disease.name.toLowerCase().includes("healthy") && disease.probability > 0.8 && (
                                         <Alert variant="destructive">
-                                            <AlertTriangle className="h-4 w-4" />
+                                            <AlertTriangle className="h-4 w-4 !text-black" />
                                             <AlertTitle className="text-red-600">Action Required</AlertTitle>
                                             <AlertDescription className="text-sm !text-gray-500">
                                                 This disease has been detected with high confidence. Immediate treatment is recommended.
