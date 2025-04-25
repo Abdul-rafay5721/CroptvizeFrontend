@@ -12,7 +12,14 @@ export const diseaseApi = createApi({
                 body: disease,
             }),
         }),
+        predictDisease: builder.mutation({
+            query: (disease) => ({
+                url: "/disease/predict",
+                method: "POST",
+                body: disease,
+            }),
+        }),
     }),
 })
 
-export const { useAddDiseaseMutation } = diseaseApi
+export const { useAddDiseaseMutation, usePredictDiseaseMutation } = diseaseApi

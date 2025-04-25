@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 import DiseaseResult from "../../components/basic/DiseaseResult"
+import { usePredictDiseaseMutation } from "../../services/diseaseApi"
 
 export default function DetectPage() {
     const [selectedImage, setSelectedImage] = useState(null)
@@ -139,36 +140,20 @@ export default function DetectPage() {
         }
     }
 
+    const [predictDisease] = usePredictDiseaseMutation()
     const detectDisease = async () => {
         if (!selectedImage) return
 
         setIsLoading(true)
         try {
-            const apiKey = 'jlCCUReGnuhSYJeGy6dOPFtv35YxYfg4xev0XdpRRbF7Smeo7I'
-            const response = await fetch('https://plant.id/api/v3/health_assessment?details=description,treatment,cause', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Api-Key': apiKey
-                },
-                body: JSON.stringify({
-                    images: [selectedImage]
-                })
-            })
+            const response = await predictDisease({ image: selectedImage }).unwrap()
+            console.log("API Response:", response);
 
-            if (!response.ok) {
-                toast.error("Error detecting disease")
-                console.error("Error response:", response)
-                return
-            }
+            const diseaseLabel = response?.data?.disease;
 
-            const data = await response.json()
-
-            if (data.result.is_plant.binary === false) {
-                toast.error("No plant detected in the image")
-                return
-            }
-            setDiseasePrediction(data.result.disease.suggestions)
+            // Create the disease data structure based on the result
+            const diseaseData = createDiseaseData(diseaseLabel);
+            setDiseasePrediction([diseaseData]);
 
             toast.success("Disease detection completed!")
         } catch (error) {
@@ -178,6 +163,210 @@ export default function DetectPage() {
             setIsLoading(false)
         }
     }
+
+    const createDiseaseData = (diseaseLabel) => {
+        // Map of static disease information
+        const diseaseInfo = {
+            "Cotton__Aphids": {
+                id: "aphids",
+                name: "Cotton Aphids",
+                probability: 0.95,
+                details: {
+                    description: "Aphids are small sap-sucking insects that can cause significant damage to cotton plants. They cluster on the undersides of leaves and on stems, extracting plant sap and causing leaves to curl, yellow, and die.",
+                    cause: "Aphids (Aphis gossypii) reproduce rapidly in warm conditions with high humidity. Overcrowding and excessive nitrogen fertilization can increase susceptibility.",
+                    treatment: {
+                        chemical: [
+                            "Apply insecticidal soaps or neem oil for light infestations",
+                            "For severe infestations, use approved insecticides like acetamiprid or flonicamid",
+                            "Systemic insecticides can provide longer-term control"
+                        ],
+                        biological: [
+                            "Introduce or encourage natural predators like ladybugs, green lacewings, and parasitic wasps",
+                            "Plant companion crops that attract beneficial insects",
+                            "Use microbial insecticides with entomopathogenic fungi"
+                        ],
+                        prevention: [
+                            "Monitor fields regularly for early detection",
+                            "Use reflective mulches to confuse and repel aphids",
+                            "Maintain proper plant spacing to improve air circulation",
+                            "Balance nitrogen fertilization to avoid excessive new growth",
+                            "Remove heavily infested plants promptly"
+                        ]
+                    }
+                }
+            },
+            "Cotton_Army_worm": {
+                id: "armyworm",
+                name: "Cotton Army Worm",
+                probability: 0.92,
+                details: {
+                    description: "Army worms are caterpillars that feed on cotton leaves and bolls, causing extensive defoliation. They typically feed at night and can destroy large areas of cotton fields in a short time.",
+                    cause: "Army worms (Spodoptera species) are the larval stage of night-flying moths. Outbreaks often occur after rainy periods followed by drought conditions.",
+                    treatment: {
+                        chemical: [
+                            "Apply specific insecticides like chlorantraniliprole or spinosad",
+                            "Use Bacillus thuringiensis (Bt) based products for organic control",
+                            "Time applications for early instars when caterpillars are most vulnerable"
+                        ],
+                        biological: [
+                            "Introduce parasitic wasps like Trichogramma that attack army worm eggs",
+                            "Use entomopathogenic nematodes for soil-dwelling pupae",
+                            "Apply biopesticides containing Beauveria bassiana or Metarhizium anisopliae"
+                        ],
+                        prevention: [
+                            "Implement pheromone traps to monitor moth populations",
+                            "Practice crop rotation to break the pest cycle",
+                            "Maintain field sanitation by removing crop residues",
+                            "Plant trap crops around cotton fields",
+                            "Consider using Bt cotton varieties where available"
+                        ]
+                    }
+                }
+            },
+            "Cotton_Bacterial_blight": {
+                id: "bacterial-blight",
+                name: "Cotton Bacterial Blight",
+                probability: 0.94,
+                details: {
+                    description: "Bacterial blight is a serious disease causing water-soaked lesions on leaves that later turn brown with yellow halos. It can also affect stems and bolls, leading to significant yield losses.",
+                    cause: "The bacterium Xanthomonas citri pv. malvacearum, which can survive in crop debris and seeds. Infection spreads rapidly in warm, humid conditions with frequent rainfall or overhead irrigation.",
+                    treatment: {
+                        chemical: [
+                            "Apply copper-based bactericides as a preventative measure",
+                            "Use streptomycin sulfate sprays where approved",
+                            "Treat seeds with approved antimicrobial agents before planting"
+                        ],
+                        biological: [
+                            "Apply biological control agents containing antagonistic bacteria",
+                            "Use compost teas containing beneficial microorganisms",
+                            "Implement biocontrol with phage therapy where available"
+                        ],
+                        prevention: [
+                            "Plant resistant cotton varieties",
+                            "Practice crop rotation with non-host plants",
+                            "Use certified disease-free seeds",
+                            "Avoid overhead irrigation to reduce leaf wetness",
+                            "Implement proper field sanitation by removing infected plant material",
+                            "Avoid working in fields when plants are wet"
+                        ]
+                    }
+                }
+            },
+            "Cotton_Healthy": {
+                id: "healthy",
+                name: "Healthy Cotton Plant",
+                probability: 1.0,
+                details: {
+                    description: "This cotton plant appears healthy with no visible signs of disease or pest infestation. Healthy cotton plants have vibrant green leaves, strong stems, and proper boll development.",
+                    cause: "Good agricultural practices, appropriate growing conditions, and effective pest management contribute to plant health.",
+                    treatment: {
+                        chemical: [],
+                        biological: [],
+                        prevention: [
+                            "Continue regular monitoring for early detection of pests and diseases",
+                            "Maintain balanced fertilization based on soil tests",
+                            "Ensure adequate but not excessive irrigation",
+                            "Practice integrated pest management (IPM)",
+                            "Maintain proper plant spacing for good air circulation",
+                            "Follow recommended crop rotation schedules"
+                        ]
+                    }
+                }
+            },
+            "Cotton_Powdery_mildew": {
+                id: "powdery-mildew",
+                name: "Cotton Powdery Mildew",
+                probability: 0.91,
+                details: {
+                    description: "Powdery mildew appears as white to grayish powdery patches on the upper surface of leaves. Severe infections can cause leaf yellowing, premature defoliation, and reduced photosynthesis leading to yield loss.",
+                    cause: "Fungal pathogen Leveillula taurica that thrives in moderate temperatures (60-80°F) with high humidity but dry leaf surfaces. Dense plant canopies create favorable conditions.",
+                    treatment: {
+                        chemical: [
+                            "Apply sulfur-based fungicides at early stages of infection",
+                            "Use systemic fungicides like triazoles or strobilurins for established infections",
+                            "Alternate fungicide classes to prevent resistance development"
+                        ],
+                        biological: [
+                            "Apply biological fungicides containing Bacillus subtilis",
+                            "Use compost teas with beneficial microorganisms",
+                            "Spray diluted milk solution (1:10 ratio with water) as an organic control"
+                        ],
+                        prevention: [
+                            "Plant resistant varieties when available",
+                            "Ensure proper plant spacing to improve air circulation",
+                            "Avoid excessive nitrogen fertilization",
+                            "Remove and destroy infected plant parts",
+                            "Implement drip irrigation to keep foliage dry",
+                            "Practice crop rotation with non-host plants"
+                        ]
+                    }
+                }
+            },
+            "Cotton__Target_spot": {
+                id: "target-spot",
+                name: "Cotton Target Spot",
+                probability: 0.93,
+                details: {
+                    description: "Target spot causes circular lesions with concentric rings and dark margins on leaves, resembling targets. Severe infections lead to defoliation, particularly in the lower canopy, affecting yield and quality.",
+                    cause: "The fungal pathogen Corynespora cassiicola, which favors warm, humid conditions with prolonged leaf wetness. The disease is more severe in dense canopies with poor air circulation.",
+                    treatment: {
+                        chemical: [
+                            "Apply strobilurin fungicides at first symptom appearance",
+                            "Use azoxystrobin, pyraclostrobin, or fluxapyroxad+pyraclostrobin",
+                            "Implement fungicide programs with different modes of action"
+                        ],
+                        biological: [
+                            "Apply Trichoderma-based biological fungicides",
+                            "Use copper-based products in organic production systems",
+                            "Implement biological control agents with antagonistic fungi"
+                        ],
+                        prevention: [
+                            "Plant resistant or tolerant varieties when available",
+                            "Practice crop rotation with non-host crops",
+                            "Ensure optimal plant spacing for good air circulation",
+                            "Manage irrigation to minimize leaf wetness duration",
+                            "Remove volunteer cotton and weeds that may harbor the pathogen",
+                            "Apply balanced fertilization based on soil tests to avoid excessive vegetative growth"
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Return the corresponding disease info or a default/error message
+        return diseaseInfo[diseaseLabel] || {
+            id: "unknown",
+            name: "Unknown Condition",
+            probability: 0.7,
+            details: {
+                description: "The condition could not be identified with certainty. Please consult with a local agricultural extension office or plant pathologist for further diagnosis.",
+                cause: "Unknown - could be environmental stress, nutrient deficiency, or an early stage of disease.",
+                treatment: {
+                    chemical: [
+                        "No specific treatments recommended without proper diagnosis"
+                    ],
+                    biological: [
+                        "No specific treatments recommended without proper diagnosis"
+                    ],
+                    prevention: [
+                        "Monitor the plant closely for any changes in symptoms",
+                        "Ensure proper watering, fertilization, and growing conditions",
+                        "Consider submitting a sample to a plant diagnostic laboratory",
+                        "Take clear close-up photos from multiple angles for better remote diagnosis"
+                    ]
+                }
+            }
+        };
+    };
+
+    const scrollIntoView = (elementId) => {
+        setTimeout(() => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
+        }, 100);
+    };
 
     useEffect(() => {
         return () => {
@@ -202,8 +391,8 @@ export default function DetectPage() {
     return (
         <div className="max-w-4xl mx-auto lg:px-0 px-4 py-8 md:py-12">
             <div className="flex flex-col items-center text-center">
-                <h1 className="text-3xl font-bold md:text-4xl">Plant Disease Detection</h1>
-                <p className="mt-4 text-lg text-muted-foreground">Upload a photo or use your camera to detect plant diseases</p>
+                <h1 className="text-3xl font-bold md:text-4xl">Cotton Disease Detection</h1>
+                <p className="mt-4 text-lg text-muted-foreground">Upload a photo or use your camera to detect cotton plant diseases</p>
             </div>
 
             <div className="mt-8 grid gap-6 md:grid-cols-2">
@@ -291,7 +480,7 @@ export default function DetectPage() {
                             <div className="relative overflow-hidden rounded-lg">
                                 <img
                                     src={selectedImage}
-                                    alt="Selected plant"
+                                    alt="Selected cotton plant"
                                     className="object-cover h-72 w-full"
                                 />
                             </div>
@@ -309,7 +498,8 @@ export default function DetectPage() {
                     </Card>
                 </div>
             )}
-            {/* Disease Detection Modal */}
+
+            {/* Disease Detection Results */}
             {diseasePrediction && (
                 <DiseaseResult
                     isOpen={!!diseasePrediction}
