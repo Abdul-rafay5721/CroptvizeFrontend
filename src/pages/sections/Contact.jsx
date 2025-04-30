@@ -1,28 +1,48 @@
 import { useState } from "react"
-import { MapPin, Phone, Mail, Clock, Send, Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
+import { Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { useSendMessageMutation } from "@/services/messageApi"
 import { toast } from "sonner"
 
 export default function ContactPage() {
     const [isLoading, setIsLoading] = useState(false)
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        subject: "",
+        message: ""
+    })
+
+    const [sendMessage] = useSendMessageMutation()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (!form.name || !form.email || !form.subject || !form.message) {
+            toast.error("Please fill in all fields")
+            return
+        }
+
         setIsLoading(true)
 
         // Simulate form submission
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await sendMessage(form).unwrap()
             toast.success("Message sent successfully!")
             // Reset form
-            const form = e.target
-            form.reset()
+            setForm({
+                name: "",
+                email: "",
+                subject: "",
+                message: ""
+            })
         } catch (error) {
             toast.error("Failed to send message")
+            console.log(error);
+
         } finally {
             setIsLoading(false)
         }
@@ -71,26 +91,26 @@ export default function ContactPage() {
                                         <label htmlFor="name" className="text-sm font-medium">
                                             Name
                                         </label>
-                                        <Input id="name" placeholder="Enter your name" required disabled={isLoading} />
+                                        <Input id="name" placeholder="Enter your name" required disabled={isLoading} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                                     </div>
                                     <div className="space-y-2">
                                         <label htmlFor="email" className="text-sm font-medium">
                                             Email
                                         </label>
-                                        <Input id="email" type="email" placeholder="Enter your email" required disabled={isLoading} />
+                                        <Input id="email" type="email" placeholder="Enter your email" required disabled={isLoading} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="subject" className="text-sm font-medium">
                                         Subject
                                     </label>
-                                    <Input id="subject" placeholder="Enter subject" required disabled={isLoading} />
+                                    <Input id="subject" placeholder="Enter subject" required disabled={isLoading} onChange={(e) => setForm({ ...form, subject: e.target.value })} />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="message" className="text-sm font-medium">
                                         Message
                                     </label>
-                                    <Textarea id="message" placeholder="Enter your message" required disabled={isLoading} rows={8} />
+                                    <Textarea id="message" placeholder="Enter your message" required disabled={isLoading} rows={8} onChange={(e) => setForm({ ...form, message: e.target.value })} />
                                 </div>
                                 <div className="w-full flex justify-end">
                                     <Button disabled={isLoading}>

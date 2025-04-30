@@ -64,9 +64,6 @@ export default function Dashboard() {
                     <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
                     <p className="text-muted-foreground">Overview of your agricultural business</p>
                 </div>
-                <div className="flex">
-                    <Button variant="outline">Download Report</Button>
-                </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

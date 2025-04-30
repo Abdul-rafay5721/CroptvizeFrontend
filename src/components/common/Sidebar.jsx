@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useLocation } from "react-router-dom"
-import { Leaf, Package, ShoppingCart, Users, ChevronLeft, ChevronRight, LayoutDashboard, Bug, Menu } from "lucide-react"
+import { Leaf, Package, ShoppingCart, Users, ChevronLeft, ChevronRight, LayoutDashboard, Bug, Menu, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -34,6 +34,11 @@ const sidebarItems = [
         href: "/dashboard/diseases",
         icon: Bug,
     },
+    {
+        title: "Messages",
+        href: "/dashboard/messages",
+        icon: MessageCircle,
+    }
 ]
 
 export default function Sidebar() {
@@ -81,7 +86,7 @@ export default function Sidebar() {
                 </Button>
             </div>
             <ScrollArea className="flex-1 py-2">
-                <nav className="grid gap-1 px-2">
+                <nav className="grid gap-x-1 gap-y-3 px-2">
                     {sidebarItems.map((item) => (
                         <Link
                             key={item.href}
