@@ -156,26 +156,6 @@ export default function Shop() {
                 </div>
 
                 <div>
-                    <h3 className="text-lg font-semibold mb-4">Price Range</h3>
-                    <div className="px-2">
-                        <Slider
-                            value={priceRange}
-                            min={0}
-                            max={1000}
-                            step={10}
-                            onValueChange={(value) => {
-                                setPriceRange(value);
-                                setPage(1);
-                            }}
-                        />
-                    </div>
-                    <div className="flex items-center justify-between mt-2 text-sm">
-                        <div>{formatPrice(priceRange[0])}</div>
-                        <div>{formatPrice(priceRange[1])}</div>
-                    </div>
-                </div>
-
-                <div>
                     <h3 className="text-lg font-semibold mb-4">Rating</h3>
                     <div className="space-y-3">
                         <div className="flex items-center">

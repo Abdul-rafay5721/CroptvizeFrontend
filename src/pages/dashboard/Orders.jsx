@@ -33,15 +33,15 @@ export default function Orders() {
 
     // Format price
     const formatPrice = (price) => {
-        return new Intl.NumberFormat("en-US", {
+        return new Intl.NumberFormat("en-PK", {
             style: "currency",
-            currency: "USD",
+            currency: "PKR",
         }).format(price)
     }
 
     // Format date
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
+        return new Date(dateString).toLocaleDateString("en-PK", {
             year: "numeric",
             month: "short",
             day: "numeric",

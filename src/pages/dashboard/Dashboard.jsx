@@ -2,11 +2,11 @@ import { useState, useEffect } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 import { ArrowDown, ArrowUp, Bug, Users, Package, ShoppingCart } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useRecentDiseasesQuery, useAnalyticsQuery } from "@/services/diseaseApi"
 import { useGetUserCountQuery } from "../../services/userApi"
 import { useGetAnalyticsQuery } from "../../services/productApi"
+import { Link } from "react-router-dom"
 
 const COLORS = ["#0C6837", "#2E8B57", "#3CB371", "#66CDAA", "#8FBC8F"]
 
@@ -63,6 +63,9 @@ export default function Dashboard() {
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
                     <p className="text-muted-foreground">Overview of your agricultural business</p>
+                </div>
+                <div>
+                    <Link to="/" className="px-3 rounded py-1 font-medium border md:me-3">Home</Link>
                 </div>
             </div>
 
@@ -137,7 +140,7 @@ export default function Dashboard() {
                                     <XAxis dataKey="name" />
                                     <YAxis />
                                     <Tooltip
-                                        formatter={(value) => [`$${value}`, "Revenue"]}
+                                        formatter={(value) => [`Rs.${value}`, "Revenue"]}
                                         contentStyle={{
                                             backgroundColor: "white",
                                             border: "1px solid #e2e8f0",
@@ -266,7 +269,7 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-sm">${order.product?.price}</span>
+                                        <span className="text-sm">Rs.{order.product?.price}</span>
                                     </div>
                                 </div>
                             ))}
