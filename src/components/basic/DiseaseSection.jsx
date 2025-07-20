@@ -75,7 +75,7 @@ const DiseasePreview = () => {
                     : diseases?.map((disease) => (
                         <Card
                             key={disease.id}
-                            className="overflow-hidden pt-0 pb-4 cursor-pointer transition-shadow hover:shadow-md"
+                            className="overflow-hidden pt-0 pb-4 cursor-pointer transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1"
                             onClick={() => handleDiseaseClick(disease)}
                         >
                             {disease.images?.[0] && (

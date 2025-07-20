@@ -93,10 +93,13 @@ export const productApi = createApi({
             })
         }),
         getOrders: builder.query({
-            query: () => ({
-                url: "/product/getOrders",
-                method: "GET",
-            }),
+            query: (params = {}) => {
+                const { page = 1, limit = 10 } = params;
+                return {
+                    url: `/product/getOrders?page=${page}&limit=${limit}`,
+                    method: "GET",
+                };
+            },
         }),
         getAnalytics: builder.query({
             query: () => ({

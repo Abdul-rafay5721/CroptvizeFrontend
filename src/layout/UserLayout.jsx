@@ -7,7 +7,11 @@ const UserLayout = () => {
     return (
         <>
             <Navbar />
-            <Outlet />
+            <div className="fade-slide-in">
+                <main className="pt-15">
+                    <Outlet />
+                </main>
+            </div>
             <Footer />
         </>
     )

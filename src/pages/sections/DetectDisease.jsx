@@ -158,8 +158,25 @@ export default function DetectPage() {
             const response = await predictDisease({ image: selectedImage }).unwrap()
             console.log("API Response:", response);
 
-            const diseaseLabel = response?.data?.disease;
-            const confidence = response?.data?.confidence || 90;
+            // Check if Plant.id API detected a plant
+            if (!response?.data?.isPlant) {
+                toast.error(response?.data?.message || "No plant or leaf detected in the image")
+                setDiseasePrediction(null) // Clear any previous predictions
+                setIsLoading(false)
+                return
+            }
+
+            // Only proceed if we have disease data
+            if (!response?.data?.disease) {
+                toast.error("Could not detect any disease")
+                setDiseasePrediction(null)
+                setIsLoading(false)
+                return
+            }
+
+            const diseaseLabel = response.data.disease;
+            const confidence = response.data.confidence || 90;
+
             // Create the disease data structure based on the result
             const diseaseData = createDiseaseData(diseaseLabel);
             setDiseasePrediction([diseaseData]);
@@ -181,8 +198,9 @@ export default function DetectPage() {
 
             toast.success("Disease detection completed!")
         } catch (error) {
+            console.error("Error in disease detection:", error);
             toast.error("Error detecting disease")
-            console.error(error)
+            setDiseasePrediction(null)
         } finally {
             setIsLoading(false)
         }

@@ -27,12 +27,14 @@ export default function Customers() {
     // Mutation hook for updating user role
     const [updateRole, { isLoading: isRoleUpdating }] = useUpdateRoleMutation();
 
-    // Extract users from response
-    const users = usersResponse?.data || [];
-    const totalUsers = users.length || 0;
-
-    // Calculate total pages - this should come from API pagination in a real app
-    const totalPages = Math.max(1, Math.ceil(totalUsers / limit));
+    // Extract users and pagination from response
+    const users = usersResponse?.data?.users || [];
+    const pagination = usersResponse?.data?.pagination || {
+        totalUsers: 0,
+        totalPages: 1,
+        page: 1,
+        limit: 10
+    };
 
     // Combined loading state
     const loading = isLoading;
@@ -156,27 +158,27 @@ export default function Customers() {
                 </CardContent>
                 <CardFooter className="flex items-center justify-between border-t p-4">
                     <div className="text-sm text-muted-foreground">
-                        Showing {users.length} of {totalUsers} customers
+                        Showing {users.length} of {pagination.totalUsers} customers
                     </div>
-                    {totalPages > 1 && (
+                    {pagination.totalPages > 1 && (
                         <div className="flex items-center space-x-2">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                                disabled={page === 1 || loading}
+                                disabled={pagination.page === 1 || loading}
                             >
                                 <ChevronLeft className="h-4 w-4" />
                                 <span className="sr-only">Previous Page</span>
                             </Button>
                             <div className="text-sm font-medium">
-                                Page {page} of {totalPages}
+                                Page {pagination.page} of {pagination.totalPages}
                             </div>
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                                disabled={page === totalPages || loading}
+                                onClick={() => setPage((prev) => Math.min(prev + 1, pagination.totalPages))}
+                                disabled={pagination.page === pagination.totalPages || loading}
                             >
                                 <ChevronRight className="h-4 w-4" />
                                 <span className="sr-only">Next Page</span>

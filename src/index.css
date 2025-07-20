@@ -121,3 +121,35 @@
     @apply bg-muted-foreground/50;
   }
 }
+
+/* Custom scrollbar for DiseaseDetailDialog - overlay style */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
+  overflow-y: overlay;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb,
+.custom-scrollbar:active::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Hide body scrollbar when dialog is open (Radix UI sets [data-state="open"] on overlay) */
+body:has([data-slot="dialog-overlay"][data-state="open"]) {
+  overflow: hidden !important;
+}

@@ -6,6 +6,7 @@ import { useAddOrderMutation } from "../../services/productApi";
 import { Loader } from "lucide-react";
 import useAuth from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
 
 // Helper function to format price
 const formatPrice = (price) => {
@@ -44,7 +45,7 @@ const ProductCard = ({ product }) => {
     }
 
     return (
-        <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-md">
+        <Card className="group relative overflow-hidden p-0 bg-white rounded-2xl border border-white/20 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
             {/* Featured badge */}
             {isFeatured && (
                 <Badge className="absolute left-2 top-2 z-10 bg-primary text-white">
@@ -53,11 +54,11 @@ const ProductCard = ({ product }) => {
             )}
 
             {/* Product image */}
-            <div className="aspect-square overflow-hidden bg-gray-100">
+            <div className="aspect-square overflow-hidden">
                 <img
                     src={image || "/placeholder.jpg"}
                     alt={name}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    className="h-full w-full object-cover rounded-t-2xl"
                 />
             </div>
 
@@ -90,7 +91,7 @@ const ProductCard = ({ product }) => {
                     </Button>
                 </div>
             </div>
-        </div>
+        </Card>
     );
 };
 

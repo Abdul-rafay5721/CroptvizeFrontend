@@ -85,7 +85,7 @@ export default function Navbar() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header className="fixed top-4 left-1/2 transform -translate-x-1/2 w-[90%] rounded-2xl shadow-lg bg-white/30 border border-white/30 backdrop-blur-md z-50">
                 <div className="max-w-7xl mx-auto flex h-16 items-center justify-between xl:px-2 md:px-5 px-4">
                     <Link to="/" className="flex items-center space-x-2">
                         <Leaf className="h-6 w-6" />
